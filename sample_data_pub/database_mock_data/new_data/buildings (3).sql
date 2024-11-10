@@ -1,0 +1,10 @@
+insert into buildings (site_id, building_id, building_name, floor_count, last_updated) values (2, 11, 'Duobam', 7, '22/11/2023');
+insert into buildings (site_id, building_id, building_name, floor_count, last_updated) values (2, 12, 'Cookley', 6, '15/03/2024');
+insert into buildings (site_id, building_id, building_name, floor_count, last_updated) values (2, 13, 'Flowdesk', 8, '18/01/2024');
+insert into buildings (site_id, building_id, building_name, floor_count, last_updated) values (2, 14, 'Sonair', 1, '31/01/2023');
+insert into buildings (site_id, building_id, building_name, floor_count, last_updated) values (2, 15, 'Stronghold', 7, '07/04/2024');
+insert into buildings (site_id, building_id, building_name, floor_count, last_updated) values (2, 16, 'Quo Lux', 6, '24/11/2023');
+insert into buildings (site_id, building_id, building_name, floor_count, last_updated) values (2, 17, 'Tampflex', 5, '24/09/2022');
+insert into buildings (site_id, building_id, building_name, floor_count, last_updated) values (2, 18, 'Aerified', 9, '03/08/2023');
+insert into buildings (site_id, building_id, building_name, floor_count, last_updated) values (2, 19, 'Sonsing', 7, '18/07/2023');
+insert into buildings (site_id, building_id, building_name, floor_count, last_updated) values (2, 20, 'Bamity', 6, '23/08/2023');

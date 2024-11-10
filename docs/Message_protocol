@@ -1,0 +1,471 @@
+Message formats:
+
+HC1 (Heimdall Configuration)
+These are the messages send from Technician web app to update Heimdall memory using REST api.
+
+====================================================================================================
+1. Create new Customer
+<app>/create_customer, methods = ['POST']
+    {
+        customer_name : <customer_name>,
+        user_name : <user_name>
+        password : <password>
+        email : <email>,
+        location : <location>,
+        phone : <phone>
+    }
+
+    Response: 200 OK
+    Response format:
+    {
+        status: "Customer Account created Successfully",
+        customer_id : <customer_id>
+    }
+
+    Response: 409 Conflict
+    Response format:
+    {
+        status: "Details already used or Account already created",
+    }
+
+    Response: 400 Bad request
+    Response format:
+    {
+        status: "Invalid Request",
+    }
+
+====================================================================================================
+2. Login
+<app>/login methods = ['POST']
+    {
+        user_name : <user_name>
+        password : <password>
+    }
+
+    Response : 200 OK
+    Response format:   
+    {    
+        login_status : "Success",
+        customer_id : <customer_id>
+        access token : <access_token>
+    }
+
+    Response : 401 OK
+    Response format:   
+    {    
+        login_status : "Incorrect user_name or password",
+    }
+
+    Response: 400 Bad request
+    Response format:
+    {
+        status: "Invalid Request",
+    }
+
+====================================================================================================
+3. Read Customer profile
+<app>/read_customer_profile , methods = ['GET']
+    {
+        customer_id : <customer_id>
+    }
+
+    Response: 200 OK
+    Response format: 
+    {
+        customer_name : <customer_name>
+        email : <email>,
+        location : <location>,
+        phone : <phone>
+    }
+
+    Response : 401 OK
+    Response format:   
+    {    
+        status : "Invalid  Customer ID",
+    }
+
+    Response: 400 Bad request
+    Response format:
+    {
+        status: "Invalid Request",
+    }
+
+====================================================================================================
+4. Update Customer profile
+<app>/update_customer_profile, methods = ['POST']
+    {
+        customer_id : <customer_id>,
+        customer_name : <customer_name>
+        email : <email>,
+        location : <location>,
+        phone : <phone>
+    }
+
+    Response: 200 OK
+    Response format: 
+    {
+        status : "Customer Profile Updated Successfully"
+    }
+
+    Response : 401 OK
+    Response format:   
+    {    
+        status : "Invalid  Customer ID",
+    }
+
+    Response: 400 Bad request
+    Response format:
+    {
+        status: "Invalid Request",
+    }
+
+====================================================================================================
+4. Add or update Customer sites details: 
+<app>/add_customer_site, methods = ['POST'/'PATCH'] 
+    {
+        customer_id: <customer_id> , 
+        sites_count: <sites_count> ,
+        sites : [
+                    {
+                        site_name : <site_name>,
+                        buildings_count : <buildings_count>,
+                    },
+                ]
+    }
+
+    Response: 200 OK
+    Response format: 
+    {
+        status : "Customer site added or updated successfully"
+    }
+
+    Response : 401 OK
+    Response format:   
+    {    
+        status : "Invalid  Customer ID",
+    }
+
+    Response: 400 Bad request
+    Response format:
+    {
+        status: "Invalid Request",
+    }
+
+====================================================================================================
+4. Read Customer site details
+<app>/read_customer_sites, methods = ['GET']
+    {
+        customer_id : <customer_id>
+    }
+
+    Response: 200 OK
+    Response format: 
+    {
+        customer_name : <customer_name>,
+        sites_count : <sites_count>
+        sites : [
+            {  
+                site_name : <site_name>,
+                site_id : <site_id>,
+                buildings_count : <buildings_count>
+            },
+            ...
+        ]
+    }
+
+    Response : 401 OK
+    Response format:   
+    {    
+        status : "Invalid  Customer ID",
+    }
+
+    Response: 400 Bad request
+    Response format:
+    {
+        status: "Invalid Request",
+    }
+
+====================================================================================================
+5. Add or update Building details:
+<app>/add_buildings, methods = ['POST']
+    {
+        site_id : <site_id>
+        buildings : [
+            {
+                building_name : <building_name>,
+                floor_count : <floor_count>    
+            },
+            ...
+        ]
+    }
+
+    Response: 200 OK
+    Response format: 
+    {
+        status: "Builing Details added successfully"
+    }
+
+    Response : 401 OK
+    Response format:   
+    {    
+        status : "Invalid Site ID",
+    }
+
+    Response: 400 Bad request
+    Response format:
+    {
+        status: "Invalid Request",
+    }
+
+====================================================================================================
+6. Read Building details:
+<app>/read_buildings, methods = ['GET']
+    {
+        site_id : <site_id>
+    }
+
+    Response: 200 OK
+    Response format: 
+    [
+        {
+            building_name : <building_name>,
+            building_id : <building_id>,
+            floor_count : <floor_count>
+        },
+        ...
+    ]
+
+    Response : 401 OK
+    Response format:   
+    {    
+        status : "Invalid Site ID",
+    }
+
+    Response: 400 Bad request
+    Response format:
+    {
+        status: "Invalid Request",
+    }
+
+====================================================================================================
+7. Add or update Floor details:
+<app>/add_floors, methods = ['POST']
+    {
+        building_id : <building_id>
+        floors: [
+            {
+                building_name : <building_name>,
+                floor_count : <floor_count>    
+            },
+            ...
+        ]
+    }
+
+    Response: 200 OK
+    Response format: 
+    {
+        status: "Floor Details added successfully"
+    }
+
+    Response : 401 OK
+    Response format:   
+    {    
+        status : "Invalid Building ID",
+    }
+
+    Response: 400 Bad request
+    Response format:
+    {
+        status: "Invalid Request",
+    }
+
+
+====================================================================================================
+8. Read Floor details:
+<app>/read_floors, methods = ['GET']
+    {
+        building_id : <building_id>
+    }
+
+    Response: 200 OK
+    Response format: 
+    [
+        {
+            floor_id : <floor_id>,
+            floor_position : <floor_position>,
+            sensor_count : <sensor_count>
+        },
+        ...
+    ]
+
+    Response : 401 OK
+    Response format:   
+    {    
+        status : "Invalid Building ID",
+    }
+
+    Response: 400 Bad request
+    Response format:
+    {
+        status: "Invalid Request",
+    }
+
+====================================================================================================
+9. Add or update sensors
+<app>/add_sensors, methods = ['POST']
+    {
+        floor_position : <floor_position>,
+        sensor_count : <sensor_count>,
+        sensors : [
+            {
+                sensor_type : <sensor_type>,
+                sensor_name : <sensor_name>
+            },
+            ...
+        ]
+    }
+
+    Response: 200 OK
+    Response format: 
+    {
+        status: "Sensor Details added successfully"
+    }
+
+    Response : 401 OK
+    Response format:   
+    {    
+        status : "Invalid Floor ID",
+    }
+
+    Response: 400 Bad request
+    Response format:
+    {
+        status: "Invalid Request",
+    }
+
+
+====================================================================================================
+10. Read Sensor details of a floor:
+<app>/read_sensor_details_floor, methods = ['GET']
+    {
+        floor_id : <floor_id>
+    }
+
+    Response: 200 OK
+    Response format: 
+    [
+        {
+            sensor_id : <floor_id>,
+            sensor_name : <sensor_name>,
+            sensor_type : <sensor_type>
+            sensor_value : <sensor_value>
+        },
+        ...
+    ]
+
+    Response : 401 OK
+    Response format:   
+    {    
+        status : "Invalid Floor ID",
+    }
+
+    Response: 400 Bad request
+    Response format:
+    {
+        status: "Invalid Request",
+    }
+
+====================================================================================================
+11. Read Sensor ID
+<app>/read_sensor_id, methods = ['GET']
+    {
+        customer_name : <customer_name>,
+        site_name : <site_name>,
+        building_name : <building_name>,
+        floor_position : <floor_position>,
+        sensor_name : <sensor_name>,
+        sensor_type : <sensor_type>
+    }
+
+    Response: 200 OK
+    Response format: 
+    {
+        sensor_id : <floor_id>,
+        
+    }
+
+    Response : 401 OK
+    Response format:   
+    {    
+        status : "Invalid Parameters",
+    }
+
+    Response: 400 Bad request
+    Response format:
+    {
+        status: "Invalid Request",
+    }
+
+
+====================================================================================================
+12. Update Sensor sensor_value
+<app>/update_sensor_value, methods = ['POST']
+    {
+        customer_name : <customer_name>,
+        site_name : <site_name>,
+        building_name : <building_name>,
+        floor_position : <floor_position>,
+        sensor_name : <sensor_name>,
+        sensor_type : <sensor_type>
+        sensor_value : <sensor_value>
+    }
+
+    Response: 200 OK
+    Response format: 
+    {
+        status: "Value updated Successfully"  
+    }
+
+    Response : 401 OK
+    Response format:   
+    {    
+        status : "Invalid Parameters",
+    }
+
+    Response: 400 Bad request
+    Response format:
+    {
+        status: "Invalid Request",
+    }
+
+====================================================================================================
+13. Read Sensor sensor_value
+<app>/read_sensor_value, methods = ['POST']
+    {
+        customer_name : <customer_name>,
+        site_name : <site_name>,
+        building_name : <building_name>,
+        floor_position : <floor_position>,
+        sensor_name : <sensor_name>,
+        sensor_type : <sensor_type>
+    }
+
+    Response: 200 OK
+    Response format: 
+    {
+        sensor_value : <sensor_value>
+        sensor_type : <sensor_type>  
+    }
+
+    Response : 401 OK
+    Response format:   
+    {    
+        status : "Invalid Parameters",
+    }
+
+    Response: 400 Bad request
+    Response format:
+    {
+        status: "Invalid Request",
+    }
+

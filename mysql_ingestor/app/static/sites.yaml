@@ -1,0 +1,129 @@
+openapi: 3.0.0
+info:
+  title: Site API
+  description: API for managing sites.
+  version: 1.0.0
+
+paths:
+  /sites_by_customer_id/{customer_id}:
+    get:
+      summary: Retrieve sites by customer ID
+      description: Get a list of all sites associated with a specific customer, including their building counts.
+      tags:
+        - Sites
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the customer whose sites are being retrieved.
+      responses:
+        '200':
+          description: A list of sites associated with the customer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Site'
+        '404':
+          description: No sites found for the given customer
+
+  /site:
+    post:
+      summary: Add a new site
+      description: Add a new site associated with a customer.
+      tags:
+        - Sites
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SiteInput'
+      responses:
+        '201':
+          description: Site created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  site_id:
+                    type: integer
+        '400':
+          description: Invalid input
+
+  /site/{site_id}:
+    put:
+      summary: Update an existing site
+      description: Update site details by site ID.
+      tags:
+        - Sites
+      parameters:
+        - name: site_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the site to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SiteInput'
+      responses:
+        '200':
+          description: Site updated successfully
+        '404':
+          description: Site not found
+
+    delete:
+      summary: Delete a site
+      description: Delete a site by site ID.
+      tags:
+        - Sites
+      parameters:
+        - name: site_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the site to delete.
+      responses:
+        '200':
+          description: Site deleted successfully
+        '404':
+          description: Site not found
+
+components:
+  schemas:
+    Site:
+      type: object
+      properties:
+        site_id:
+          type: integer
+        customer_id:
+          type: integer
+        site_name:
+          type: string
+        site_location:
+          type: string
+        last_updated:
+          type: string
+          format: date-time
+        buildings_count:
+          type: integer
+          description: Number of buildings associated with the site
+
+    SiteInput:
+      type: object
+      properties:
+        site_name:
+          type: string
+        customer_id:
+          type: integer
+        site_location:
+          type: string

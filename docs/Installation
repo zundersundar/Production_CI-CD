@@ -1,0 +1,16 @@
+Initial configuration:
+Heimdall shall have a installation and configuration web page for technicians who configure the devices and sensors. Technician shall have the provision to enter the following details
+a. Customer name
+b. Site name
+c. Building details
+    i. Building name
+    ii. Floor count
+    iii. Floor details
+        1. Floor position
+        2. Sensor count
+        3. Sensor details
+            - Sensor name
+            - Sensor Type
+
+Modify configuration:
+Technician can add, delete or modify the details in the webpage. 

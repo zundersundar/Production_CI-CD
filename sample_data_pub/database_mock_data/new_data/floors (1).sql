@@ -1,0 +1,10 @@
+insert into floors (building_id, floor_id, floor_position, sensor_count, last_updated) values (1, 1, 1, 28, '19/07/2022');
+insert into floors (building_id, floor_id, floor_position, sensor_count, last_updated) values (1, 2, 2, 22, '27/09/2023');
+insert into floors (building_id, floor_id, floor_position, sensor_count, last_updated) values (1, 3, 3, 43, '21/01/2023');
+insert into floors (building_id, floor_id, floor_position, sensor_count, last_updated) values (1, 4, 4, 10, '04/12/2022');
+insert into floors (building_id, floor_id, floor_position, sensor_count, last_updated) values (1, 5, 5, 24, '27/03/2024');
+insert into floors (building_id, floor_id, floor_position, sensor_count, last_updated) values (1, 6, 6, 14, '30/11/2022');
+insert into floors (building_id, floor_id, floor_position, sensor_count, last_updated) values (1, 7, 7, 8, '25/05/2023');
+insert into floors (building_id, floor_id, floor_position, sensor_count, last_updated) values (1, 8, 8, 50, '29/10/2023');
+insert into floors (building_id, floor_id, floor_position, sensor_count, last_updated) values (1, 9, 9, 37, '18/09/2022');
+insert into floors (building_id, floor_id, floor_position, sensor_count, last_updated) values (1, 10, 10, 8, '19/02/2023');

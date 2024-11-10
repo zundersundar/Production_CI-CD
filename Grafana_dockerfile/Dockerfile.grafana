@@ -1,0 +1,12 @@
+# Dockerfile.grafana
+FROM grafana/grafana:latest
+
+# Define Grafana volume
+VOLUME /var/lib/grafana
+
+# Expose Grafana port
+EXPOSE 3000
+
+# Command to run Grafana
+CMD ["/run.sh"]
+

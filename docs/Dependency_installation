@@ -1,0 +1,3 @@
+Redis:
+- Make sure bind is configured to 0.0.0.0 (Add relevant ips in future to ensure security)
+- set protected_mode to yes

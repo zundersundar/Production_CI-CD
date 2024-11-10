@@ -1,0 +1,48 @@
+openapi: 3.0.0
+info:
+  title: MQTT Topics API
+  description: API for retrieving MQTT topics.
+  version: 1.0.0
+
+paths:
+  /mqtt_topics:
+    get:
+      summary: Get all MQTT topics
+      description: Retrieves a list of all MQTT topics from the database.
+      tags:
+        - MQTT Topics
+      responses:
+        '200':
+          description: A list of MQTT topics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    topic_name:
+                      type: string
+                      example: "/devices/sensor1"
+                    customer_name:
+                      type: string
+                      example: "Customer A"
+                    site_name:
+                      type: string
+                      example: "Site B"
+                    building_name:
+                      type: string
+                      example: "Building C"
+        '404':
+          description: No MQTT topics found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No MQTT topics found"

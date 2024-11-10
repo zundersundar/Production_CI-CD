@@ -1,0 +1,8 @@
+Port numbers assigned to each container
+
+MQTT: No Port numbers configured
+Jarvis: 6000
+Heimdall: 7000
+InfluxDB: 9000
+MySQL: 8000
+Patrol: 6999

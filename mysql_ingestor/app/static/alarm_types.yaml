@@ -1,0 +1,42 @@
+openapi: 3.0.0
+info:
+  title: Alarm API
+  description: API documentation for managing alarm types.
+  version: 1.0.0
+
+paths:
+  /alarm_types:
+    get:
+      summary: Retrieve all alarm types
+      description: Returns a list of all alarm types available in the system.
+      tags:
+        - Alarm Types
+      responses:
+        '200':
+          description: Successfully retrieved alarm types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: The ID of the alarm type
+                    name:
+                      type: string
+                      description: The name of the alarm type
+                    severity:
+                      type: string
+                      description: The severity level of the alarm type
+        '404':
+          description: No alarm types found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: No alarm types found

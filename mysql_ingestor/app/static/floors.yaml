@@ -1,0 +1,263 @@
+openapi: 3.0.0
+info:
+  title: Floor API
+  description: API documentation for managing floors.
+  version: 1.0.0
+
+paths:
+  /floors_by_building_id/{building_id}:
+    get:
+      summary: Get Floors by Building ID
+      description: Retrieve a list of floors associated with a specific building ID.
+      tags:
+        - Floors
+      parameters:
+        - name: building_id
+          in: path
+          required: true
+          description: The ID of the building to retrieve floors for.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of floors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Floor'
+        '404':
+          description: No floors found for the given building ID.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /upload_floor_plan:
+    post:
+      summary: Upload Floor Plan
+      description: Upload a floor plan image for a specific floor.
+      tags:
+        - Floors
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Floor plan uploaded successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  file_name:
+                    type: string
+        '400':
+          description: Invalid file or file size exceeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /delete_floor_plan/{filename}:
+    delete:
+      summary: Delete Floor Plan
+      description: Delete a specific floor plan by filename.
+      tags:
+        - Floors
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          description: The name of the floor plan file to delete.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Floor plan deleted successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Floor plan not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: File name not provided.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /uploads/floor_plan/{filename}:
+    get:
+      summary: Get Uploaded Floor Plan
+      description: Retrieve an uploaded floor plan by filename.
+      tags:
+        - Floors
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          description: The name of the floor plan file to retrieve.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved the floor plan.
+        '404':
+          description: Floor plan not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /floor:
+    post:
+      summary: Add Floor
+      description: Add a new floor to a building.
+      tags:
+        - Floors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FloorInput'
+      responses:
+        '201':
+          description: Floor added successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  floor_id:
+                    type: integer
+
+  /floor/{floor_id}:
+    put:
+      summary: Update Floor
+      description: Update details of an existing floor.
+      tags:
+        - Floors
+      parameters:
+        - name: floor_id
+          in: path
+          required: true
+          description: The ID of the floor to update.
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FloorInput'
+      responses:
+        '200':
+          description: Floor updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+        '404':
+          description: Floor not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+    delete:
+      summary: Delete Floor
+      description: Delete a specific floor by floor ID.
+      tags:
+        - Floors
+      parameters:
+        - name: floor_id
+          in: path
+          required: true
+          description: The ID of the floor to delete.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Floor deleted successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+        '404':
+          description: Floor not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  schemas:
+    Floor:
+      type: object
+      properties:
+        floor_id:
+          type: integer
+        building_id:
+          type: integer
+        floor_position:
+          type: integer
+        floor_plan:
+          type: string
+        last_updated:
+          type: string
+          format: date-time
+
+    FloorInput:
+      type: object
+      properties:
+        building_id:
+          type: integer
+        floor_position:
+          type: integer
+        floor_plan:
+          type: string
