@@ -1,0 +1,8 @@
+Flask==2.0.1
+Flask-SQLAlchemy==2.5.1
+Flask-Migrate==3.1.0
+Flask-Marshmallow==0.14.0
+marshmallow-sqlalchemy==0.23.1
+python-dotenv==0.15.0
+PyMySQL==1.0.2
+SQLAlchemy==1.4.22

@@ -1,0 +1,292 @@
+openapi: 3.0.0
+info:
+  title: Sensor API
+  description: API documentation for managing sensors in the MySQL Ingestor.
+  version: 1.0.0
+
+paths:
+  /sensors_by_floor_id/{floor_id}:
+    get:
+      summary: Get sensors by floor ID
+      description: Retrieve all sensors located on a specific floor.
+      tags:
+        - Sensors
+      parameters:
+        - name: floor_id
+          in: path
+          required: true
+          description: ID of the floor to retrieve sensors from
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully retrieved list of sensors on the specified floor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  floor_id:
+                    type: integer
+                  floor_position:
+                    type: integer
+                  total_sensor_count:
+                    type: integer
+                  sensors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Sensor'
+        '404':
+          description: No sensors found for the provided floor ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: No sensors found for the provided floor ID
+
+  /sensor_id/{customer_name}/{site_name}/{building_name}/{floor_position}/{sensor_name}/{sensor_type}:
+    get:
+      summary: Get sensor ID based on attributes
+      description: Retrieve sensor ID by providing specific attributes.
+      tags:
+        - Sensors
+      parameters:
+        - name: customer_name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: site_name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: building_name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: floor_position
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: sensor_name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: sensor_type
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved sensor ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sensor_id:
+                    type: integer
+        '404':
+          description: Sensor ID not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Sensor ID not found
+
+  /sensor_id_and_value/{customer_name}/{site_name}/{building_name}/{floor_position}/{sensor_name}/{sensor_type}:
+    get:
+      summary: Get sensor ID and value based on attributes
+      description: Retrieve both the sensor ID and its current value by providing specific attributes.
+      tags:
+        - Sensors
+      parameters:
+        - name: customer_name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: site_name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: building_name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: floor_position
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: sensor_name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: sensor_type
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved sensor ID and value
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sensor_id:
+                    type: integer
+                  value:
+                    type: number
+        '404':
+          description: Sensor not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Sensor not found
+
+  /multiple_sensors:
+    post:
+      summary: Add multiple sensors
+      description: Create multiple sensors in a single request.
+      tags:
+        - Sensors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/SensorInput'
+      responses:
+        '201':
+          description: Successfully created multiple sensors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sensor_ids:
+                    type: array
+                    items:
+                      type: integer
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid input data
+
+    put:
+      summary: Update multiple sensors
+      description: Modify the details of multiple sensors in a single request.
+      tags:
+        - Sensors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Sensor'
+      responses:
+        '200':
+          description: Successfully updated sensors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Update successful
+        '404':
+          description: One or more sensors not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Sensor with id {sensor_id} not found
+
+components:
+  schemas:
+    Sensor:
+      type: object
+      properties:
+        sensor_id:
+          type: integer
+          description: Unique identifier for the sensor
+        sensor_name:
+          type: string
+          description: The name of the sensor
+        value:
+          type: number
+          description: The current value of the sensor
+        floor_id:
+          type: integer
+          description: The ID of the floor the sensor is located on
+        type_name:
+          type: string
+          description: The type of the sensor
+        last_updated:
+          type: string
+          format: date-time
+          description: The timestamp of the last update
+        source:
+          type: string
+          description: The source of the sensor data
+        x_coordinate:
+          type: number
+          description: X coordinate of the sensor
+        y_coordinate:
+          type: number
+          description: Y coordinate of the sensor
+
+    SensorInput:
+      type: object
+      properties:
+        floor_id:
+          type: integer
+        sensor_name:
+          type: string
+        value:
+          type: integer
+        sensor_type:
+          type: string
+        source:
+          type: string
+        x_coordinate:
+          type: number
+          format: float
+        y_coordinate:
+          type: number
+          format: float

@@ -1,0 +1,15 @@
+# Dockerfile.redis
+FROM redis:latest
+
+# Copy the custom Redis configuration file
+COPY redis.conf /usr/local/etc/redis/redis.conf
+
+# Define Redis volume
+VOLUME /data
+
+# Expose Redis port
+EXPOSE 6379
+
+# Command to run Redis with custom configuration
+CMD ["redis-server", "/usr/local/etc/redis/redis.conf"]
+

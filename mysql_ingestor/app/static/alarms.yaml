@@ -1,0 +1,316 @@
+openapi: 3.0.0
+info:
+  title: MySQL Ingestor API - Alarm Management
+  description: API documentation for managing alarms.
+  version: 1.0.0
+
+paths:
+  /alarms_by_sensor_id/{sensor_id}:
+    get:
+      summary: Get alarms by sensor ID
+      description: Returns a list of alarms associated with the specified sensor ID.
+      tags:
+        - Alarms
+      parameters:
+        - name: sensor_id
+          in: path
+          required: true
+          description: ID of the sensor
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully retrieved alarms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Alarm'
+        '404':
+          description: No alarms found for the given sensor ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: No alarms found for the specified sensor ID
+
+  /alarms_by_building_id/{building_id}:
+    get:
+      summary: Get alarms by building ID
+      description: Returns a list of alarms associated with the specified building ID.
+      tags:
+        - Alarms
+      parameters:
+        - name: building_id
+          in: path
+          required: true
+          description: ID of the building
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully retrieved alarms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Alarm'
+        '404':
+          description: No alarms found for the given building ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: No alarms found for the specified building ID
+
+  /alarm:
+    post:
+      summary: Add a new alarm
+      description: Creates a new alarm in the system.
+      tags:
+        - Alarms
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Alarm'
+      responses:
+        '201':
+          description: Alarm created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  alarm_id:
+                    type: integer
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid input data
+
+  /alarm/{id}:
+    put:
+      summary: Update an existing alarm
+      description: Updates the details of an existing alarm.
+      tags:
+        - Alarms
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the alarm to update
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Alarm'
+      responses:
+        '200':
+          description: Alarm updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Alarm updated successfully
+        '404':
+          description: Alarm not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Alarm not found
+
+    delete:
+      summary: Delete an existing alarm
+      description: Deletes an alarm from the system.
+      tags:
+        - Alarms
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the alarm to delete
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Alarm deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Alarm deleted successfully
+        '404':
+          description: Alarm not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Alarm not found
+
+  /clear_alarm:
+    post:
+      summary: Clear an alarm
+      description: Clears a specified alarm.
+      tags:
+        - Alarms
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+      responses:
+        '200':
+          description: Alarm cleared successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Alarm cleared successfully
+        '404':
+          description: Alarm not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Alarm not found
+
+  /set_alarm:
+    post:
+      summary: Set an alarm
+      description: Sets a specified alarm.
+      tags:
+        - Alarms
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+      responses:
+        '200':
+          description: Alarm set successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Alarm set successfully
+        '404':
+          description: Alarm not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Alarm not found
+
+  /clear_building_alarms:
+    post:
+      summary: Clear all alarms for a building
+      description: Clears all alarms associated with a specified building.
+      tags:
+        - Alarms
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                building_id:
+                  type: integer
+      responses:
+        '200':
+          description: Building alarms cleared successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Building alarms cleared successfully
+        '404':
+          description: No alarms found for this building
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: No alarms found for the specified building
+
+components:
+  schemas:
+    Alarm:
+      type: object
+      properties:
+        id:
+          type: integer
+        building_id:
+          type: integer
+        sensor_id:
+          type: integer
+        name:
+          type: string
+        upper_threshold:
+          type: number
+        lower_threshold:
+          type: number
+        floor_id:
+          type: integer
+        last_updated:
+          type: string
+          format: date-time
+        status:
+          type: boolean

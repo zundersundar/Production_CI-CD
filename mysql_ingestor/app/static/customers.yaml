@@ -1,0 +1,186 @@
+openapi: 3.0.0
+info:
+  title: Customer API
+  description: API for managing customers.
+  version: 1.0.0
+
+paths:
+  /customers:
+    get:
+      summary: Retrieve all customers
+      description: Get a list of all customers with their associated site counts.
+      tags:
+        - Customers
+      responses:
+        '200':
+          description: A list of customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+        '404':
+          description: No customers found
+
+  /customer:
+    post:
+      summary: Add a new customer
+      description: Add a new customer with their name, email, and logo.
+      tags:
+        - Customers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInput'
+      responses:
+        '201':
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  new_customer_id:
+                    type: integer
+        '400':
+          description: Invalid input
+
+  /customer/{customer_id}:
+    put:
+      summary: Update an existing customer
+      description: Update customer details by customer ID.
+      tags:
+        - Customers
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the customer to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInput'
+      responses:
+        '200':
+          description: Customer updated successfully
+        '404':
+          description: Customer not found
+
+    delete:
+      summary: Delete a customer
+      description: Delete a customer by customer ID.
+      tags:
+        - Customers
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the customer to delete.
+      responses:
+        '200':
+          description: Customer deleted successfully
+        '404':
+          description: Customer not found
+
+  /upload_logo:
+    post:
+      summary: Upload customer logo
+      description: Upload a logo file for a customer.
+      tags:
+        - Customers
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Logo uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  file_name:
+                    type: string
+        '400':
+          description: File upload error (e.g., file too large or unsupported format)
+
+  /delete_logo/{filename}:
+    delete:
+      summary: Delete customer logo
+      description: Delete a customer's logo by the filename.
+      tags:
+        - Customers
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The filename of the logo to delete.
+      responses:
+        '200':
+          description: Logo deleted successfully
+        '404':
+          description: File not found
+
+  /uploads/customer_logo/{filename}:
+    get:
+      summary: Retrieve customer logo
+      description: Get a customer's logo by filename.
+      tags:
+        - Customers
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The filename of the logo.
+      responses:
+        '200':
+          description: Logo file retrieved successfully
+        '404':
+          description: File not found
+
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        customer_id:
+          type: integer
+        customer_name:
+          type: string
+        email:
+          type: string
+        logo:
+          type: string
+        sites_count:
+          type: integer
+          description: Number of sites associated with the customer
+
+    CustomerInput:
+      type: object
+      properties:
+        customer_name:
+          type: string
+        email:
+          type: string
+        logo:
+          type: string

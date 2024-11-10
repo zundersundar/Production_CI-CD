@@ -1,0 +1,7 @@
+Energy Dashboard:
+    Total Energy Usage (Single Gauge): 
+    from(bucket: "Heimdall-influxdb")
+    |> range(start: -1h)
+    |> filter(fn: (r) => r._measurement == "SensorData" and r.sensor_type == "Energy")
+    |> group()
+    |> sum(column: "_value")

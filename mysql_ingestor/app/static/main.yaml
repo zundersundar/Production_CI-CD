@@ -1,0 +1,107 @@
+openapi: 3.0.0
+info:
+  title: MySQL Ingestor API
+  description: Main API documentation for the MySQL Ingestor.
+  version: 1.0.0
+
+paths:
+  # Referencing MQTT Topics API
+  /mqtt_topics:
+    $ref: './mqtt_topics.yaml#/paths/~1mqtt_topics'
+
+  # Referencing Customer API
+  /customers:
+    $ref: './customers.yaml#/paths/~1customers'
+
+  /customer:
+    $ref: './customers.yaml#/paths/~1customer'
+
+  /customer/{customer_id}:
+    $ref: './customers.yaml#/paths/~1customer~1{customer_id}'
+
+  /upload_logo:
+    $ref: './customers.yaml#/paths/~1upload_logo'
+
+  /delete_logo/{filename}:
+    $ref: './customers.yaml#/paths/~1delete_logo~1{filename}'
+
+  /uploads/customer_logo/{filename}:
+    $ref: './customers.yaml#/paths/~1uploads~1customer_logo~1{filename}'
+
+  # Referencing Site API
+  /sites_by_customer_id/{customer_id}:
+    $ref: './sites.yaml#/paths/~1sites_by_customer_id~1{customer_id}'
+
+  /site:
+    $ref: './sites.yaml#/paths/~1site'
+
+  /site/{site_id}:
+    $ref: './sites.yaml#/paths/~1site~1{site_id}'
+
+  # Referencing Building API
+  /buildings_by_site_id/{site_id}:
+    $ref: './buildings.yaml#/paths/~1buildings_by_site_id~1{site_id}'
+
+  /building:
+    $ref: './buildings.yaml#/paths/~1building'
+
+  /building/{building_id}:
+    $ref: './buildings.yaml#/paths/~1building~1{building_id}'
+
+  # Referencing Floor API
+  /floors_by_building_id/{building_id}:
+    $ref: './floors.yaml#/paths/~1floors_by_building_id~1{building_id}'
+
+  /upload_floor_plan:
+    $ref: './floors.yaml#/paths/~1upload_floor_plan'
+
+  /delete_floor_plan/{filename}:
+    $ref: './floors.yaml#/paths/~1delete_floor_plan~1{filename}'
+
+  /uploads/floor_plan/{filename}:
+    $ref: './floors.yaml#/paths/~1uploads~1floor_plan~1{filename}'
+
+  /floor:
+    $ref: './floors.yaml#/paths/~1floor'
+
+  /floor/{floor_id}:
+    $ref: './floors.yaml#/paths/~1floor~1{floor_id}'
+
+  # Referencing Sensor API
+  /sensors_by_floor_id/{floor_id}:
+    $ref: './sensors.yaml#/paths/~1sensors_by_floor_id~1{floor_id}'
+
+  /sensor_id/{customer_name}/{site_name}/{building_name}/{floor_position}/{sensor_name}/{sensor_type}:
+    $ref: './sensors.yaml#/paths/~1sensor_id~1{customer_name}~1{site_name}~1{building_name}~1{floor_position}~1{sensor_name}~1{sensor_type}'
+
+  /sensor_id_and_value/{customer_name}/{site_name}/{building_name}/{floor_position}/{sensor_name}/{sensor_type}:
+    $ref: './sensors.yaml#/paths/~1sensor_id_and_value~1{customer_name}~1{site_name}~1{building_name}~1{floor_position}~1{sensor_name}~1{sensor_type}'
+
+  /multiple_sensors:
+    $ref: './sensors.yaml#/paths/~1multiple_sensors'
+
+  # Referencing Alarm Types API
+  /alarm_types:
+    $ref: './alarm_types.yaml#/paths/~1alarm_types'
+
+  # Referencing Alarm API
+  /alarms_by_sensor_id/{sensor_id}:
+    $ref: './alarms.yaml#/paths/~1alarms_by_sensor_id~1{sensor_id}'
+
+  /alarms_by_building_id/{building_id}:
+    $ref: './alarms.yaml#/paths/~1alarms_by_building_id~1{building_id}'
+
+  /alarm:
+    $ref: './alarms.yaml#/paths/~1alarm'
+
+  /alarm/{id}:
+    $ref: './alarms.yaml#/paths/~1alarm~1{id}'
+
+  /clear_alarm:
+    $ref: './alarms.yaml#/paths/~1clear_alarm'
+
+  /set_alarm:
+    $ref: './alarms.yaml#/paths/~1set_alarm'
+
+  /clear_building_alarms:
+    $ref: './alarms.yaml#/paths/~1clear_building_alarms'

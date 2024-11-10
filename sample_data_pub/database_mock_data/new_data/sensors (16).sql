@@ -1,0 +1,10 @@
+insert into sensors (sensor_id, floor_id, type_id, sensor_name, value, last_updated) values (111, 2, 3, 'S1', 72, '14/05/2023');
+insert into sensors (sensor_id, floor_id, type_id, sensor_name, value, last_updated) values (112, 2, 3, 'S4', 17, '23/09/2023');
+insert into sensors (sensor_id, floor_id, type_id, sensor_name, value, last_updated) values (113, 2, 3, 'S2', 78, '31/07/2023');
+insert into sensors (sensor_id, floor_id, type_id, sensor_name, value, last_updated) values (114, 2, 3, 'S5', 86, '11/05/2023');
+insert into sensors (sensor_id, floor_id, type_id, sensor_name, value, last_updated) values (115, 2, 3, 'S3', 24, '16/10/2022');
+insert into sensors (sensor_id, floor_id, type_id, sensor_name, value, last_updated) values (116, 2, 3, 'S6', 82, '29/10/2022');
+insert into sensors (sensor_id, floor_id, type_id, sensor_name, value, last_updated) values (117, 2, 3, 'S9', 25, '25/02/2024');
+insert into sensors (sensor_id, floor_id, type_id, sensor_name, value, last_updated) values (118, 2, 3, 'S7', 35, '14/06/2023');
+insert into sensors (sensor_id, floor_id, type_id, sensor_name, value, last_updated) values (119, 2, 3, 'S0', 87, '18/09/2022');
+insert into sensors (sensor_id, floor_id, type_id, sensor_name, value, last_updated) values (120, 2, 3, 'S8', 90, '26/02/2024');

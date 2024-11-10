@@ -1,0 +1,14 @@
+.env
+env/
+MyfirstInstance.pem
+package_creator/package_creator_env/
+package_creator/heimdall_tools.egg-info/
+mysql_ingestor/**/__pycache__/
+*.pyc
+__pycache__/
+mysql_ingestor/assets/customer_logo/*
+mysql_ingestor/assets/floor_plan/*
+
+!mysql_ingestor/assets/customer_logo/.gitkeep
+!mysql_ingestor/assets/floor_plan/.gitkeep
+

@@ -1,0 +1,10 @@
+insert into customers (customer_id, customer_name) values (1, 'Bartlett');
+insert into customers (customer_id, customer_name) values (2, 'Deck');
+insert into customers (customer_id, customer_name) values (3, 'Osbourne');
+insert into customers (customer_id, customer_name) values (4, 'Caty');
+insert into customers (customer_id, customer_name) values (5, 'Tobie');
+insert into customers (customer_id, customer_name) values (6, 'Vinnie');
+insert into customers (customer_id, customer_name) values (7, 'Ingram');
+insert into customers (customer_id, customer_name) values (8, 'Tory');
+insert into customers (customer_id, customer_name) values (9, 'Mala');
+insert into customers (customer_id, customer_name) values (10, 'Alister');

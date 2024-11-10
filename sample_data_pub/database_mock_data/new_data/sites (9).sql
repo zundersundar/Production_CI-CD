@@ -1,0 +1,10 @@
+insert into sites (customer_id, site_id, site_name, buildings_count, last_updated) values (2, 11, 'Oloo', 8, '22/12/2022');
+insert into sites (customer_id, site_id, site_name, buildings_count, last_updated) values (2, 12, 'Kanoodle', 5, '26/05/2023');
+insert into sites (customer_id, site_id, site_name, buildings_count, last_updated) values (2, 13, 'Latz', 1, '30/05/2023');
+insert into sites (customer_id, site_id, site_name, buildings_count, last_updated) values (2, 14, 'Demivee', 3, '05/01/2023');
+insert into sites (customer_id, site_id, site_name, buildings_count, last_updated) values (2, 15, 'Eire', 8, '18/12/2023');
+insert into sites (customer_id, site_id, site_name, buildings_count, last_updated) values (2, 16, 'Tagopia', 6, '19/02/2023');
+insert into sites (customer_id, site_id, site_name, buildings_count, last_updated) values (2, 17, 'Omba', 9, '13/09/2022');
+insert into sites (customer_id, site_id, site_name, buildings_count, last_updated) values (2, 18, 'Innojam', 4, '05/10/2023');
+insert into sites (customer_id, site_id, site_name, buildings_count, last_updated) values (2, 19, 'Centimia', 7, '11/02/2023');
+insert into sites (customer_id, site_id, site_name, buildings_count, last_updated) values (2, 20, 'Plajo', 4, '26/03/2024');

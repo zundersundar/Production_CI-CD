@@ -1,0 +1,125 @@
+openapi: 3.0.0
+info:
+  title: Building API
+  description: API for managing buildings.
+  version: 1.0.0
+
+paths:
+  /buildings_by_site_id/{site_id}:
+    get:
+      summary: Retrieve all buildings for a specific site
+      description: Get a list of all buildings associated with the given site ID.
+      tags:
+        - Buildings
+      parameters:
+        - name: site_id
+          in: path
+          required: true
+          description: The ID of the site for which to retrieve buildings.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of buildings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Building'
+        '404':
+          description: No buildings found for the given site ID
+
+  /building:
+    post:
+      summary: Add a new building
+      description: Add a new building with its site ID and name.
+      tags:
+        - Buildings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuildingInput'
+      responses:
+        '201':
+          description: Building created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  building_id:
+                    type: integer
+        '400':
+          description: Invalid input
+
+  /building/{building_id}:
+    put:
+      summary: Update an existing building
+      description: Update building details by building ID.
+      tags:
+        - Buildings
+      parameters:
+        - name: building_id
+          in: path
+          required: true
+          description: The ID of the building to update.
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuildingInput'
+      responses:
+        '200':
+          description: Building updated successfully
+        '404':
+          description: Building not found
+
+    delete:
+      summary: Delete a building
+      description: Delete a building by building ID.
+      tags:
+        - Buildings
+      parameters:
+        - name: building_id
+          in: path
+          required: true
+          description: The ID of the building to delete.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Building deleted successfully
+        '404':
+          description: Building not found
+
+components:
+  schemas:
+    Building:
+      type: object
+      properties:
+        building_id:
+          type: integer
+        site_id:
+          type: integer
+        building_name:
+          type: string
+        last_updated:
+          type: string
+          format: date-time
+        floors_count:
+          type: integer
+          description: Number of floors associated with the building
+
+    BuildingInput:
+      type: object
+      properties:
+        site_id:
+          type: integer
+        building_name:
+          type: string

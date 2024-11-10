@@ -1,0 +1,12 @@
+# Dockerfile.influxdb
+FROM influxdb:latest
+
+# Define InfluxDB volume
+VOLUME /var/lib/influxdb
+
+# Expose InfluxDB port
+EXPOSE 8086
+
+# Command to run InfluxDB
+CMD ["influxd"]
+
