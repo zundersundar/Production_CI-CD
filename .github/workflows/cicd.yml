@@ -32,7 +32,7 @@ jobs:
       
       - name: Run tests
         run: |
-          pytest  # or your preferred testing framework
+          python3  # or your preferred testing framework
 
   deploy:
     runs-on: ubuntu-latest
@@ -47,7 +47,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
