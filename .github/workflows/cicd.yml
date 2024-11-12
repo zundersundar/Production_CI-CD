@@ -32,7 +32,7 @@ jobs:
       - name: Start mysql_ingestor
         run: |
          python3 mysql_ingestor/run.py &
-         sleep 10  # Give mysql_ingestor time to initialize
+         sleep 10  
 
     # Run all other modules in parallel
       - name: Run other modules concurrently
