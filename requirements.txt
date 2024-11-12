@@ -43,3 +43,4 @@ urllib3==1.26.18
 werkzeug==3.0.2
 zipp==3.18.1
 hvac==2.3.0
+flask_swagger_ui==3.0.12
