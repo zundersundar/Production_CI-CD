@@ -6,3 +6,4 @@ marshmallow-sqlalchemy==0.23.1
 python-dotenv==0.15.0
 PyMySQL==1.0.2
 SQLAlchemy==1.4.22
+flask_swagger_ui==3.0.12
