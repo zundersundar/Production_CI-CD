@@ -23,13 +23,13 @@ jobs:
           node-version: '16'
 
       - name: Install frontend dependencies
-        run: cd frontend && npm install
+        run:  npm install
 
      # - name: Run ESLint
-     #   run: cd frontend && npx eslint . --ext .js,.jsx
+     #   run:  npx eslint . --ext .js,.jsx
 
      # - name: Run frontend tests
-     #   run: cd frontend && npm test -- --coverage --watchAll=false
+     #   run:  npm test -- --coverage --watchAll=false
 
       # Backend Analysis
       - name: Set up Python
@@ -38,16 +38,16 @@ jobs:
           python-version: '3.12'
 
       - name: Install backend dependencies
-        run: cd backend && pip install -r requirements.txt
+        run:  pip install -r requirements.txt
 
       - name: Run Flake8
-        run: cd backend && flake8 .
+        run:  flake8 .
 
       - name: Run Bandit Security Scan
-        run: cd backend && bandit -r .
+        run:  bandit -r .
 
       - name: Run backend tests
-        run: cd backend && pytest --cov=.
+        run:  pytest --cov=.
 
   deploy:
     runs-on: ubuntu-latest
