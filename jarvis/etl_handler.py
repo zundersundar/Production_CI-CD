@@ -18,42 +18,43 @@ redis_conn = None
 mysql_ingestor_url = 'http://127.0.0.1:8000'
 etl_heimdall_handler_queue = {
     'region' : 'eu-west-1',
-    'url': 'https://sqs.eu-west-1.amazonaws.com/009925156537/etl_heimdall_handler_queue'
+    'url' : 'https://sqs.eu-west-1.amazonaws.com/009925156537/etl-to-heimdall'
 }
 
 def read_sensor_id_and_value(sensor_data):
-    read_sensor_id_value_endpoint = f"{mysql_ingestor_url}/read_sensor_id_and_value"
-    print(f"TW_DBG, Reading Sensor ID and Value from memory, 'customer_name' : {sensor_data['customer_name']}, \
-                'site_name' : {sensor_data['site_name']}, \
-                'building_name' : {sensor_data['building_name']},\
-                'floor_position' : {sensor_data['floor_position']}, \
-                'sensor_type' : {sensor_data['sensor_type']}, \
-                'sensor_name' : {sensor_data['sensor_name']}"\
-            )
+    read_sensor_id_value_endpoint = (
+        f"{mysql_ingestor_url}/sensor_id_and_value/"
+        f"{sensor_data['customer_name']}/"
+        f"{sensor_data['site_name']}/"
+        f"{sensor_data['building_name']}/"
+        f"{sensor_data['floor_position']}/"
+        f"{sensor_data['sensor_name']}/"
+        f"{sensor_data['sensor_type']}"
+    )
+    
+    print(f"TW_DBG, Reading Sensor ID and Value from memory, 'customer_name' : {sensor_data['customer_name']}, "
+          f"'site_name' : {sensor_data['site_name']}, "
+          f"'building_name' : {sensor_data['building_name']}, "
+          f"'floor_position' : {sensor_data['floor_position']}, "
+          f"'sensor_type' : {sensor_data['sensor_type']}, "
+          f"'sensor_name' : {sensor_data['sensor_name']}")
+    
     try:
-        response = requests.post (
-            read_sensor_id_value_endpoint,
-            json = {
-                'customer_name' : sensor_data['customer_name'], 
-                'site_name' : sensor_data['site_name'], 
-                'building_name' : sensor_data['building_name'],
-                'floor_position' : sensor_data['floor_position'],
-                'sensor_type' : sensor_data['sensor_type'],
-                'sensor_name' : sensor_data['sensor_name'] 
-            }
-        )
+        response = requests.get(read_sensor_id_value_endpoint)
+
         if response.status_code == 200:
-            # Check if the request was successful, Parse the JSON response
             response_data = response.json()
-            # Extract sensor_value
             return response_data
         elif response.status_code == 404:
             print("Sensor Not Found")
             return None
+        else:
+            print(f"TW_ERR: Unexpected error code {response.status_code}")
+            return {'status': 'error', 'status_code': response.status_code}
 
     except Exception as e:
         print(f"{str(e)} : Error occured in read_sensor_id_and_value Endpoint. Please Debug. Cannot Go Further")
-    
+        
     return -1
 
 # TODO Redesign to handle data process more asynchronously
@@ -90,11 +91,11 @@ def etl_thread(sensor_data):
     if prev_sensor_value is None or sensor_id is None:
         sensor_data['customer_name'] = customer_name
         sensor_data['site_name'] = site_name
-        sensor_data['building_name'] = building_name,
+        sensor_data['building_name'] = building_name
         response = read_sensor_id_and_value(sensor_data)
         if response is not None:
             # Extract sensor_value
-            prev_sensor_value = response['sensor_value']
+            prev_sensor_value = response['value']
             sensor_id = response['sensor_id']
             set_with_expiry(redis_conn, redis_sensor_id_key, sensor_id, expiry_time=5)
         elif response is None:
@@ -125,7 +126,7 @@ def etl_thread(sensor_data):
     result = write_to_sqs_queue (
         region = etl_heimdall_handler_queue['region'],
         queue_url = etl_heimdall_handler_queue['url'],
-        message_body = sensor_data
+        message_body = json.dumps(sensor_data)
     )
 
 
@@ -152,4 +153,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
