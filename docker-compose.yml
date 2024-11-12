@@ -1,0 +1,70 @@
+version: "3"
+
+services:
+  
+  injestor:
+
+    build: ~/dockerize/TowerWatch/mysql_ingestor/
+
+    image: injestor:latest
+    container_name: mysql_ingestor
+    ports: 
+      - "8000:8000"
+    networks:
+      - tower
+
+
+  influx:
+
+    build: ~/dockerize/TowerWatch/influxdb_ingestor
+
+    image: influx:latest
+    container_name: influx_container
+    ports:
+      - "9000:9000"
+    networks:
+      - tower
+
+  mqtt:
+  
+    build: ~/dockerize/TowerWatch/mqtt/
+    image: mqtt:latest
+    #entrypoint: ["/bin/sh", "-c", "sleep 600" ]
+    container_name: mqtt
+    ports:
+      - "3333:3333"
+    networks:
+      - tower
+
+
+  etl:
+    build: ~/dockerize/TowerWatch/jarvis/
+    image: etl:latest
+    container_name: etl
+    ports:
+      - "6000:6000"
+    networks:
+      - tower
+
+  heimdall:
+     
+    build: ~/dockerize/TowerWatch/heimdall
+    image: heimdall:latest
+    container_name: heimdall
+    ports:
+      - "7000:7000"
+    networks:
+      - tower
+
+        #  patrol:
+        # build: ~/dockerize/TowerWatch/patrol
+        # image: patrol:latest
+        # container_name: patrol
+        # ports:
+        # - "6999:6999"
+        # networks:
+        # - tower
+
+networks:
+  tower:
+    driver: bridge
