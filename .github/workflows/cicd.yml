@@ -29,21 +29,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      
-      - name: Run ingestor
+      - name: Start mysql_ingestor
         run: |
-           python3 mysql_ingestor/run.py &
-           python3 mqtt/mqtt_sub.py &
-      - name: etl
+         python3 mysql_ingestor/run.py &
+         sleep 10  # Give mysql_ingestor time to initialize
+
+    # Run all other modules in parallel
+      - name: Run other modules concurrently
         run: |
-           python3 jarvis/etl_handler.py 
-      - name: heimdall
-        run: |
-           python3 heimdall/heimdall_handler.py
-      - name: alarms
-        run: |
-           python3 patrol/alarms.py 
-           wait
+         python3 mqtt/mqtt_sub.py &
+         python3 jarvis/etl_handler.py &
+         python3 heimdall/heimdall_handler.py &
+         wait     
 
   deploy:
     runs-on: ubuntu-latest
