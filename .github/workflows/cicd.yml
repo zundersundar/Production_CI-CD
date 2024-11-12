@@ -1,5 +1,5 @@
 name: Towerwatch CI/CD Pipeline
-
+    
 on:
   push:
     branches:
@@ -34,9 +34,15 @@ jobs:
         run: |
            python3 mysql_ingestor/run.py &
            python3 mqtt/mqtt_sub.py &
-           python3 jarvis/etl_handler.py &
-           python3 heimdall/heimdall_handler.py &
-           python3 patrol/alarms.py &
+      - name: etl
+        run: |
+           python3 jarvis/etl_handler.py 
+      - name: heimdall
+        run: |
+           python3 heimdall/heimdall_handler.py
+      - name: alarms
+        run: |
+           python3 patrol/alarms.py 
            wait
 
   deploy:
