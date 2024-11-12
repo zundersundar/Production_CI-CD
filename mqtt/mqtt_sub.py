@@ -23,9 +23,10 @@ mqtt_listener_sns = {
     }
 
 mqtt_etl_handler_queue = {
-    'region' : 'eu-west-1',
-    'url' : 'https://sqs.eu-west-1.amazonaws.com/009925156537/mqtt_etl_handler_queue'
-}
+   'region' : 'eu-west-1',
+   #'url' : 'https://sqs.eu-west-1.amazonaws.com/009925156537/mqtt-to-etl'
+   'url' : 'https://sqs.eu-west-1.amazonaws.com/009925156537/mqtt_etl_handler_queue'
+   }
 
 
 class Topic:
