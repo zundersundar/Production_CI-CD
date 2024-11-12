@@ -32,23 +32,12 @@ jobs:
       
       - name: Run ingestor
         run: |
-          python3  mysql_ingestor/run.py
-          
-      - name: Run Mqtt_sub
-        run: |
-          python3 mqtt/mqtt_sub.py
-
-      - name: Run ETL
-        run: |
-          python3 jarvis/etl_handler.py
-
-      - name: Heimdall Handler
-        run: |
-          python3 heimdall/heimdall_handler.py
-      
-      - name: Patrol
-        run: |
-          python3 patrol/alarms.py
+           python3 mysql_ingestor/run.py &
+           python3 mqtt/mqtt_sub.py &
+           python3 jarvis/etl_handler.py &
+           python3 heimdall/heimdall_handler.py &
+           python3 patrol/alarms.py &
+           wait
 
   deploy:
     runs-on: ubuntu-latest
