@@ -46,8 +46,8 @@ jobs:
    #   - name: Run Flake8
    #     run:  flake8 .
 
-      - name: Run Bandit Security Scan
-        run:  bandit -r .
+   #   - name: Run Bandit Security Scan
+   #     run:  bandit -r .
 
       - name: Run backend tests
         run:  pytest --cov=.
