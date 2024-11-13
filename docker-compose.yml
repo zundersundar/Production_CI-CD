@@ -4,7 +4,7 @@ services:
   
   injestor:
 
-    build: ~/dockerize/TowerWatch/mysql_ingestor/
+    build: ./mysql_ingestor/
 
     image: injestor:latest
     container_name: mysql_ingestor
@@ -16,7 +16,7 @@ services:
 
   influx:
 
-    build: ~/dockerize/TowerWatch/influxdb_ingestor
+    build: ./influxdb_ingestor
 
     image: influx:latest
     container_name: influx_container
@@ -27,7 +27,7 @@ services:
 
   mqtt:
   
-    build: ~/dockerize/TowerWatch/mqtt/
+    build: ./mqtt/
     image: mqtt:latest
     #entrypoint: ["/bin/sh", "-c", "sleep 600" ]
     container_name: mqtt
@@ -38,7 +38,7 @@ services:
 
 
   etl:
-    build: ~/dockerize/TowerWatch/jarvis/
+    build: ./jarvis/
     image: etl:latest
     container_name: etl
     ports:
@@ -48,7 +48,7 @@ services:
 
   heimdall:
      
-    build: ~/dockerize/TowerWatch/heimdall
+    build: ./heimdall
     image: heimdall:latest
     container_name: heimdall
     ports:
