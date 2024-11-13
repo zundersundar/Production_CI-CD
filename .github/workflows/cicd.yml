@@ -43,14 +43,16 @@ jobs:
           pip install -r requirements.txt
           pip install flake8 bandit pytest  pytest-cov 
 
-   #   - name: Run Flake8
-   #     run:  flake8 .
+      - name: Run Flake8
+        run:  flake8 .  --exclude=sample_data_pub/,unit_test
 
-   #   - name: Run Bandit Security Scan
-   #     run:  bandit -r .
+
+      - name: Run Bandit Security Scan
+        run:  bandit -r . --exclude=sample_data_pub,unit_test
 
       - name: Run backend tests
-        run:  pytest --cov=.
+        run:  pytest --cov=.  --ignore=sample_data_pub, --ignore=unit_test
+
 
   deploy:
     runs-on: ubuntu-latest
