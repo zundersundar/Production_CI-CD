@@ -15,7 +15,8 @@ from heimdall_tools.vault import get_vault_secrets
 app = Flask(__name__)
 redis_server_ip = None
 redis_conn = None
-mysql_ingestor_url = 'http://127.0.0.1:8000'
+#mysql_ingestor_url = 'http://127.0.0.1:8000'
+mysql_ingestor_url = 'http:// mysql_ingestor:8000'
 etl_heimdall_handler_queue = {
     'region' : 'eu-west-1',
     'url' : 'https://sqs.eu-west-1.amazonaws.com/009925156537/etl-to-heimdall'
