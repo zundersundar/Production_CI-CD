@@ -69,10 +69,10 @@ jobs:
         
       - name: Start SSH agent and add key
         run: |
-          eval "$(ssh-agent -s)"
-          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+         sudo eval "$(ssh-agent -s)"
+         sudo echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+         SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.7.0
@@ -81,12 +81,12 @@ jobs:
 
       - name: Copy files to EC2
         run: |
-          scp -o StrictHostKeyChecking=no -r * ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/app
+         sudo scp -o StrictHostKeyChecking=no -r * ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/app
 
       - name: Deploy on EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
-          cd /home/ubuntu/app
-          docker-compose down
-          docker-compose up -d --build
+         sudo ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+         sudo cd /home/ubuntu/app
+         sudo docker-compose down
+         sudo docker-compose up -d --build
           EOF
