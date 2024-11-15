@@ -15,7 +15,8 @@ from heimdall_tools.vault import get_vault_secrets
 
 
 app = Flask(__name__)
-mysql_ingestor_url = 'http://127.0.0.1:8000'
+#mysql_ingestor_url = 'http://127.0.0.1:8000'
+mysql_ingestor_url = 'http:// mysql_ingestor:8000'
 influx_ingestor_url = 'http://127.0.0.1:9000'
 
 redis_server_ip = None
