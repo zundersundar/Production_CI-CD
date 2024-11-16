@@ -1,0 +1,104 @@
+version: "3.9"
+
+services:
+  # Existing services grouped under deployment profile
+  injestor:
+    build: ./mysql_ingestor/
+    image: injestor:latest
+    container_name: mysql_ingestor
+    ports: 
+      - "8000:8000"
+    networks:
+      - tower
+    profiles:
+      - deployment
+
+  influx:
+    build: ./influxdb_ingestor
+    image: influx:latest
+    container_name: influx_container
+    ports:
+      - "9000:9000"
+    networks:
+      - tower
+    profiles:
+      - deployment
+
+  mqtt:
+    build: ./mqtt/
+    image: mqtt:latest
+    container_name: mqtt
+    ports:
+      - "3333:3333"
+    networks:
+      - tower
+    profiles:
+      - deployment
+
+  etl:
+    build: ./jarvis/
+    image: etl:latest
+    container_name: etl
+    ports:
+      - "6000:6000"
+    networks:
+      - tower
+    profiles:
+      - deployment
+
+  heimdall:
+    build: ./heimdall
+    image: heimdall:latest
+    container_name: heimdall
+    ports:
+      - "7000:7000"
+    networks:
+      - tower
+    profiles:
+      - deployment
+
+      
+        #  patrol:
+        # build: ~/dockerize/TowerWatch/patrol
+        # image: patrol:latest
+        # container_name: patrol
+        # ports:
+        # - "6999:6999"
+        # networks:
+        # - tower
+        #profiles:
+        # -deployment
+
+  # Add SonarQube for testing profile
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    networks:
+      - tower
+    profiles:
+      - testing
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+      - SONAR_WEB_HOST=0.0.0.0
+      - SONAR_JDBC_USERNAME=sonar
+      - SONAR_JDBC_PASSWORD=sonar
+      - SONAR_JDBC_URL=jdbc:postgresql://db:5432/sonar
+
+  # PostgreSQL for SonarQube
+  db:
+    image: postgres:15
+    container_name: sonarqube-db
+    networks:
+      - tower
+    profiles:
+      - testing
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonar
+
+networks:
+  tower:
+    driver: bridge
