@@ -24,6 +24,7 @@ jobs:
 
       - name: Install frontend dependencies
         run:  npm install
+        working-directory: ./frontend
 
       - name: Run ESLint
         run:  npx eslint . --ext .js,.jsx || true
