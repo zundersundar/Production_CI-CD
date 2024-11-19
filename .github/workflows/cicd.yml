@@ -17,19 +17,19 @@ jobs:
         uses: actions/checkout@v3
 
       # Frontend Analysis
-     # - name: Set up Node.js
-     #   uses: actions/setup-node@v3
-     #   with:
-     #     node-version: '16'
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
 
-    #  - name: Install frontend dependencies
-    #    run:  npm install
+      - name: Install frontend dependencies
+        run:  npm install
 
-    #  - name: Run ESLint
-    #    run:  npx eslint . --ext .js,.jsx || true
+      - name: Run ESLint
+        run:  npx eslint . --ext .js,.jsx || true
 
-    #  - name: Run frontend tests
-#        run:  npm test -- --coverage --watchAll=false || true
+      - name: Run frontend tests
+        run:  npm test -- --coverage --watchAll=false || true
 
       # Backend Analysis
       - name: Set up Python
@@ -40,8 +40,7 @@ jobs:
       - name: Install backend dependencies
         run: |  
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install flake8 bandit pytest  pytest-cov 
+          pip install -r requirements.txt -r dev-requirements.txt
 
       - name: Run Flake8
         run:  flake8 .  --exclude=sample_data_pub/,unit_test || true
