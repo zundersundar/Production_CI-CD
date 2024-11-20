@@ -32,9 +32,11 @@ jobs:
 
       - name: Run ESLint
         run:  npx eslint .  || true
+        working-directory: ./frontend
 
       - name: Run frontend tests
         run:  npm test -- --coverage --watchAll=false || true
+        working-directory: ./frontend
 
       # Backend Analysis
       - name: Set up Python
