@@ -26,7 +26,7 @@ class MYSQL_DB_CLIENT:
         self.host = '192.168.5.66'
         self.username = 'nishan'
         self.password = 'Nishanclockhash%40123'
-        self.db_name = common_secrets.get('RDS_DB_NAME')
+        self.db_name = 'heimdall_memory_db'
         print(self.host)
         connection_string = f"mysql+pymysql://{self.username}:{self.password}@{self.host}/{self.db_name}"
         self.engine = create_engine(connection_string)
