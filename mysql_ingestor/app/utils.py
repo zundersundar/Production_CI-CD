@@ -23,9 +23,9 @@ class MYSQL_DB_CLIENT:
         os.getenv('VAULT_ADDR'),os.getenv('VAULT_USER_SECRETS_PATH'),
         os.getenv('VAULT_USERNAME'),os.getenv('VAULT_PASSWORD')
     )
-        self.host = common_secrets.get('RDS_HOSTNAME')
-        self.username = user_secrets.get('RDS_USERNAME')
-        self.password = user_secrets.get('RDS_PASSWORD')
+        self.host = '192.168.5.66'
+        self.username = 'nishan'
+        self.password = 'Nishanclockhash%40123'
         self.db_name = common_secrets.get('RDS_DB_NAME')
         print(self.host)
         connection_string = f"mysql+pymysql://{self.username}:{self.password}@{self.host}/{self.db_name}"
