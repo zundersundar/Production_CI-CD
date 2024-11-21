@@ -11,11 +11,12 @@ from flask import Flask, jsonify
 from dotenv import load_dotenv
 import requests, os
 from heimdall_tools.vault import get_vault_secrets
+import time 
 
 app = Flask(__name__)
 mqtt_topic_names = []
 #mysql_ingestor_url = 'http://127.0.0.1:8000'
-mysql_ingestor_url = 'http:// mysql_ingestor:8000'
+mysql_ingestor_url='http://mysql_ingestor:8000'
 #TODO Read it from DB 
 mqtt_listener_sns = {
     "arn" : "arn:aws:sns:eu-west-1:009925156537:mqtt_listener",
@@ -24,10 +25,9 @@ mqtt_listener_sns = {
     }
 
 mqtt_etl_handler_queue = {
-   'region' : 'eu-west-1',
-   #'url' : 'https://sqs.eu-west-1.amazonaws.com/009925156537/mqtt-to-etl'
-   'url' : 'https://sqs.eu-west-1.amazonaws.com/009925156537/mqtt_etl_handler_queue'
-   }
+    'region' : 'eu-west-1',
+    'url' : 'https://sqs.eu-west-1.amazonaws.com/009925156537/mqtt_etl_handler_queue'
+}
 
 
 class Topic:
@@ -92,23 +92,26 @@ class CHDB_MQTT_SUB:
             #mqtt_topic_names_read = 'http://127.0.0.1:8000/read_mqtt_topic_names'
             print(f"TW_DBG, MySQL Server IP : {mysql_ingestor_url}")
             mqtt_topic_names_read = f"{mysql_ingestor_url}/mqtt_topics"
-            try:
-                response = requests.get(mqtt_topic_names_read)
-                response.raise_for_status()
-                global mqtt_topic_names
-                data = response.json()
-                for topic in data:
-                    # Later in the code, populate mqtt_topic_names
-                    print("TW_DBG, Received the topic data")
-                    print(topic["customer_name"], topic["site_name"], topic["building_name"], topic["topic_name"])
-                    mqtt_topic_names.append(Topic(topic["customer_name"], topic["site_name"], topic["building_name"], topic["topic_name"]))
-                set_with_expiry(redis_conn,"mqtt_topic_names_read_required", str(False), expiry_time=5)
-                
-            except Exception as e:
-                error_message = str(e)
-                print(error_message)
-                return False
-                
+
+            while True:
+                try:
+                    response = requests.get(mqtt_topic_names_read)
+                    response.raise_for_status()
+                    global mqtt_topic_names
+                    data = response.json()
+                    for topic in data:
+                        # Later in the code, populate mqtt_topic_names
+                        print("TW_DBG, Received the topic data")
+                        print(topic["customer_name"], topic["site_name"], topic["building_name"], topic["topic_name"])
+                        mqtt_topic_names.append(Topic(topic["customer_name"], topic["site_name"], topic["building_name"], topic["topic_name"])) 
+                    set_with_expiry(redis_conn,"mqtt_topic_names_read_required", str(False), expiry_time=5)
+                    return True
+
+                except requests.exceptions.RequestException as e:
+                    error_message = str(e)
+                    print(f"Connection failed: {error_message}")
+                    time.sleep(3)
+
         return True
 
     
