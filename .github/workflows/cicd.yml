@@ -59,7 +59,7 @@ jobs:
         run:  flake8 .  --exclude=sample_data_pub/,unit_test || true
       
       - name: Run pylint
-        run: pylint . --exclude=sample_data_pub/,unit_test || true
+        run: pylint . --ignore=sample_data_pub,unit_test || true
 
 
       - name: Run Bandit Security Scan
@@ -67,10 +67,11 @@ jobs:
 
       - name: Run Single Unit Test File
         run: |
-         python -m unittest discover -s unit_test -p "heimdall_tools_test.py" || true
+         python -m unittest discover -s unit_test -p "*.py" || true
+
 
      # - name: Run backend tests
-    #    run:  pytest --cov=.  --ignore=sample_data_pub, --ignore=unit_test || true
+     #   run:  pytest --cov=.  --ignore=sample_data_pub, --ignore=unit_test || true
 
 
   deploy:
