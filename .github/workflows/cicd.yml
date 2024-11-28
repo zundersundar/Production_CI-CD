@@ -67,6 +67,7 @@ jobs:
 
       - name: Run Single Unit Test File
         run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd):$(pwd)/mysql_ingestor:$(pwd)/heimdall:$(pwd)/jarvis:$(pwd)/mqtt:$(pwd)/influx_ingestor
           python -m unittest unit_test.heimdall_tools_test || true
 
 
