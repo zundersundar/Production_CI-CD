@@ -56,7 +56,7 @@ services:
     networks:
       - tower
   app:
-    build: .
+    build: ./unit_test
     command: >
       sh -c "python -m unittest unit_test.heimdall_tools_test && python run.py"
     volumes:
