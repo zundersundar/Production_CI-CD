@@ -55,12 +55,7 @@ services:
       - "7000:7000"
     networks:
       - tower
-  app:
-    build: ./unit_test
-    command: >
-      sh -c "python -m unittest unit_test.heimdall_tools_test && python run.py"
-    volumes:
-      - .:/app
+  
         #  patrol:
         # build: ~/dockerize/TowerWatch/patrol
         # image: patrol:latest
