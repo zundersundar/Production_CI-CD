@@ -67,8 +67,7 @@ jobs:
 
       - name: Run Single Unit Test File
         run: |
-          export PYTHONPATH=$PYTHONPATH:$(pwd):$(pwd)./mysql_ingestor:$(pwd)./heimdall:$(pwd)./jarvis:$(pwd)./mqtt:$(pwd)./influx_ingestor
-          python -m unittest discover -s unit_test -p "heimdall_tools_test.py"
+          python -m unittest discover -s unit_test -p "dynamic_unit_test.py" || exit 1
 
 
       - name: Run backend tests
