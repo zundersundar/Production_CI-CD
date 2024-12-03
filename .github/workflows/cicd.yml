@@ -39,6 +39,18 @@ jobs:
         run:  npx prettier --check . || true
         working-directory: ./frontend
 
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate . || true
+        working-directory: ./frontend
+
+      - name: Install Retire.js
+        run: npm install -g retire . || true
+        working-directory: ./frontend
+
+      - name: Run Retire.js  || true
+        run: retire .
+        working-directory: ./frontend
+
     
       - name: Run frontend tests
         run:  npm test -- --coverage --watchAll=false || true
