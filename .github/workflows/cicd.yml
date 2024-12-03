@@ -44,11 +44,11 @@ jobs:
         working-directory: ./frontend
 
       - name: Install Retire.js
-        run: npm install -g retire . || true
+        run: npm install -g retire  
         working-directory: ./frontend
 
-      - name: Run Retire.js  || true
-        run: retire .
+      - name: Run Retire.js  
+        run: retire .  || true
         working-directory: ./frontend
 
     
