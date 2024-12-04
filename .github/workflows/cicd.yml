@@ -83,7 +83,7 @@ jobs:
 
 
       - name: Run backend tests
-        run:  pytest --cov=heimdall --cov=mqtt --cov=jarvis --cov=mysql_ingestor --cov=influx_dbingestor --cov=patrol  --ignore=sample_data_pub --ignore=unit_test --cov-report=term-missing  ||true #--ignore=sample_data_pub --ignore=unit_test || true
+        run:  pytest --cov=heimdall --cov=mqtt --cov=jarvis --cov=mysql_ingestor --cov=influxdb_ingestor --cov=patrol  --ignore=sample_data_pub --ignore=unit_test --cov-report=term-missing  ||true #--ignore=sample_data_pub --ignore=unit_test || true
 
 
   deploy:
