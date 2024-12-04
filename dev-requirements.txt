@@ -2,4 +2,5 @@
 flake8
 bandit
 pylint
-pytest
+pytest 
+pytest-cov
