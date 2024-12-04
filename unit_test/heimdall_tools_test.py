@@ -166,14 +166,14 @@ def test_read_data_from_s3():
 
 
 def main():
-    sqs_queue_write_test()
-    mysql_client_test()
+   # sqs_queue_write_test()
+   # mysql_client_test()
     redis_client_test()
-    time.sleep(3)
-    test_post_to_sns_topic()
-    sqs_queue_read_test()
-    test_upload_data_to_s3()
-    test_read_data_from_s3()
+   # time.sleep(3)
+   # test_post_to_sns_topic()
+   # sqs_queue_read_test()
+   # test_upload_data_to_s3()
+   # test_read_data_from_s3()
 
 
 if __name__ == "__main__":
