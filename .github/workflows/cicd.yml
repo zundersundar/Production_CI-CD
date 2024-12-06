@@ -96,7 +96,7 @@ jobs:
             ["./heimdall/Dockerfile"]="heimdall"
             ["./mqtt/Dockerfile"]="mqtt"
             ["./jarvis/Dockerfile"]="etl"
-            ["./influx/Dockerfile"]="influxdb_ingestor"
+            ["./influxdb_ingestor/Dockerfile"]="influxdb_ingestor"
           )
 
           for dockerfile in "${!DOCKERFILES[@]}"; do
