@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tower-watch-deployment
+  labels:
+    app: tower-watch
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tower-watch
+  template:
+    metadata:
+      labels:
+        app: tower-watch
+    spec:
+      containers:
+        - name: mysql-ingestor
+          image: ghcr.io/zundersundar/mysql_ingestor
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ENV_VAR_EXAMPLE
+              value: "value"
+
+        - name: heimdall
+          image: ghcr.io/zundersundar/heimdall
+          ports:
+            - containerPort: 9090
+          env:
+            - name: CONFIG_PATH
+              value: "/etc/config"
+
+        - name: mqtt
+          image: ghcr.io/zundersundar/mqtt
+          ports:
+            - containerPort: 7070
+          env:
+            - name: MQTT_BROKER_URL
+              value: "mqtt://broker"
+
+        - name: etl
+          image: ghcr.io/zundersundar/etl
+          ports:
+            - containerPort: 6060
+          env:
+            - name: SOURCE_PATH
+              value: "/data/source"
+
+        - name: influxdb-ingestor
+          image: ghcr.io/zundersundar/influxdb_ingestor
+          ports:
+            - containerPort: 5050
+          env:
+            - name: INFLUXDB_URL
+              value: "http://influxdb:8086"
+
+      restartPolicy: Always
