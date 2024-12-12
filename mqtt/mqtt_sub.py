@@ -16,7 +16,7 @@ import time
 app = Flask(__name__)
 mqtt_topic_names = []
 #mysql_ingestor_url = 'http://127.0.0.1:8000'
-mysql_ingestor_url='http://mysql_ingestor:8000'
+mysql_ingestor_url='http://mysql-ingestor:8000'
 #TODO Read it from DB 
 mqtt_listener_sns = {
     "arn" : "arn:aws:sns:eu-west-1:009925156537:mqtt_listener",
