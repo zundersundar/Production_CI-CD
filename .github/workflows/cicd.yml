@@ -112,13 +112,16 @@ jobs:
           SERVICES=("injestor" " influx" "mqtt" "etl" "heimdall") # Replace with your actual services
           
           for SERVICE in "${SERVICES[@]}"; do
-            IMAGE=${{ secrets.DOCKER_USERNAME }}/${SERVICE}:${{ github.sha }}
-            docker tag ${SERVICE} ${IMAGE}
-            docker push ${IMAGE}
+          SOURCE_IMAGE=${SERVICE}:latest
+          TARGET_IMAGE=${REPO_NAME}-${SERVICE}:${{ github.sha }}
 
-            # Optionally push 'latest' tag
-            docker tag ${IMAGE} ${{ secrets.DOCKER_USERNAME }}/${SERVICE}:latest
-            docker push ${{ secrets.DOCKER_USERNAME }}/${SERVICE}:latest
+          # Tag and push the specific image
+          docker tag ${SOURCE_IMAGE} ${TARGET_IMAGE}
+          docker push ${TARGET_IMAGE}
+
+          # Tag and push the latest image
+          docker tag ${TARGET_IMAGE} ${REPO_NAME}-${SERVICE}:latest
+          docker push ${REPO_NAME}-${SERVICE}:latest
           done
 
 
