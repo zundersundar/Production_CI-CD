@@ -109,7 +109,7 @@ jobs:
         run: |
           # List of services to push
           REPO_NAME=${{ secrets.DOCKER_USERNAME }}/towerwatch
-          SERVICES=("injestor" " influx" "mqtt" "etl" "heimdall") # Replace with your actual services
+          SERVICES=("injestor" "influx" "mqtt" "etl" "heimdall") # Replace with your actual services
           
           for SERVICE in "${SERVICES[@]}"; do
           SOURCE_IMAGE=${SERVICE}:latest
