@@ -2,11 +2,11 @@ version: "3"
 
 services:
   
-  injestor:
+  ingestor:
 
     build: ./mysql_ingestor/
 
-    image: injestor:latest
+    image: ingestor:latest
     container_name: mysql_ingestor
     ports: 
       - "8000:8000"
