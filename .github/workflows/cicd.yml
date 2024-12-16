@@ -71,7 +71,8 @@ jobs:
         run: |
           MODULES=("mqtt" "heimdall" "mysql_ingestor" "etl" "influx")
           for MODULE in "${MODULES[@]}"; do
-            if [[ "${{ env.${MODULE} }}" == "true" ]]; then
+            ENV_VAR_NAME=$(echo "${MODULE}" | tr '[:lower:]' '[:upper:]')  # Convert to uppercase for consistency
+            if [[ "${!MODULE}" == "true" ]]; then
               echo "Running Pylint for $MODULE"
               pylint $MODULE || true
             fi
@@ -81,21 +82,22 @@ jobs:
         run: |
           MODULES=("mqtt" "heimdall" "mysql_ingestor" "etl" "influx")
           for MODULE in "${MODULES[@]}"; do
-            if [[ "${{ env.${MODULE} }}" == "true" ]]; then
+            if [[ "${!MODULE}" == "true" ]]; then
               echo "Running Bandit for $MODULE"
               bandit -r $MODULE || true
             fi
-          done
+            done
 
       - name: Run backend tests for changed modules
         run: |
           MODULES=("mqtt" "heimdall" "mysql_ingestor" "etl" "influx")
           for MODULE in "${MODULES[@]}"; do
-            if [[ "${{ env.${MODULE} }}" == "true" ]]; then
+            if [[ "${!MODULE}" == "true" ]]; then
               echo "Running tests for $MODULE"
               pytest --cov=$MODULE --cov-report=term-missing || true
             fi
           done
+
 
   build-and-deploy:
     runs-on: ubuntu-latest
