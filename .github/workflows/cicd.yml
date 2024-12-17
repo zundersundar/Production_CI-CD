@@ -116,7 +116,7 @@ jobs:
       - name: Build and Push Docker Images for Changed Modules
         run: |
           REPO_NAME=${{ secrets.DOCKER_USERNAME }}/towerwatch
-          MODULES=("mqtt" "heimdall" "mysql_ingestor" "jarvis" "influxdb_ingestor")
+          MODULES=("mqtt" "heimdall" "mysql_ingestor" "jarvis" "influxdb_ingestor" "frontend")
           
           for MODULE in "${MODULES[@]}"; do
             if [[ "${{ env.${MODULE} }}" == "true" ]]; then
@@ -131,7 +131,7 @@ jobs:
 
       - name: Deploy to Kubernetes for Changed Modules
         run: |
-          MODULES=("mqtt" "heimdall" "mysql_ingestor" "etl" "influx")
+          MODULES=("mqtt" "heimdall" "mysql_ingestor" "etl" "influx" "frontend")
           
           for MODULE in "${MODULES[@]}"; do
             if [[ "${{ env.${MODULE} }}" == "true" ]]; then
