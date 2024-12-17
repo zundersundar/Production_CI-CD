@@ -16,88 +16,42 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Detect changed modules
-        id: detect-changes
-        run: |
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changed_files.txt
-          
-          MODULES=("frontend" "mqtt" "heimdall" "mysql_ingestor" "etl" "influx")
-          for MODULE in "${MODULES[@]}"; do
-            if grep -q "^${MODULE}/" changed_files.txt; then
-              echo "${MODULE}=true" >> $GITHUB_ENV
-            else
-              echo "${MODULE}=false" >> $GITHUB_ENV
-            fi
-          done
-
-      # Frontend Sanity Check
-      - name: Frontend Sanity Check
-        if: env.frontend == 'true'
-        run: echo "Running frontend sanity checks..."
-
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20.9.0'
 
-      - name: Install frontend dependencies
-        run: npm install
-        working-directory: ./frontend
-
-      - name: Run ESLint
-        run: npx eslint . || true
-        working-directory: ./frontend
-
-      - name: Run Prettier
-        run: npx prettier --check . || true
-        working-directory: ./frontend
-
-      # Backend Sanity Check
-      - name: Backend Sanity Check
-        if: env.mqtt == 'true' || env.heimdall == 'true' || env.mysql_ingestor == 'true' || env.etl == 'true' || env.influx == 'true'
-        run: echo "Running backend sanity checks..."
-
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.12'
-
-      - name: Install backend dependencies
+      - name: Install NX CLI and dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt -r dev-requirements.txt
+          npm install -g nx
+          npm install
 
-      - name: Run Pylint for changed modules
+      - name: Detect Changed Projects with NX
+        id: nx-changes
         run: |
-          MODULES=("mqtt" "heimdall" "mysql_ingestor" "etl" "influx")
-          for MODULE in "${MODULES[@]}"; do
-            ENV_VAR_NAME=$(echo "${MODULE}" | tr '[:lower:]' '[:upper:]')  # Convert to uppercase for consistency
-            if [[ "${!MODULE}" == "true" ]]; then
-              echo "Running Pylint for $MODULE"
-              pylint $MODULE || true
+          CHANGED_PROJECTS=$(npx nx show projects --affected --base=origin/main)
+          echo "CHANGED_PROJECTS=${CHANGED_PROJECTS}" >> $GITHUB_ENV
+          echo "Changed Projects: ${CHANGED_PROJECTS}"
+
+      - name: Run Sanity Checks for Changed Projects
+        run: |
+          for PROJECT in ${{ env.CHANGED_PROJECTS }}; do
+            echo "Running sanity checks for $PROJECT"
+            if [[ "$PROJECT" == "frontend" ]]; then
+              cd frontend
+              npm install
+              npx eslint . || true
+              npx prettier --check . || true
+              cd ..
+            else
+              echo "Backend checks for $PROJECT"
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt -r dev-requirements.txt
+              pylint $PROJECT || true
+              bandit -r $PROJECT || true
+              pytest --cov=$PROJECT --cov-report=term-missing || true
             fi
           done
-
-      - name: Run Bandit for changed modules
-        run: |
-          MODULES=("mqtt" "heimdall" "mysql_ingestor" "etl" "influx")
-          for MODULE in "${MODULES[@]}"; do
-            if [[ "${!MODULE}" == "true" ]]; then
-              echo "Running Bandit for $MODULE"
-              bandit -r $MODULE || true
-            fi
-            done
-
-      - name: Run backend tests for changed modules
-        run: |
-          MODULES=("mqtt" "heimdall" "mysql_ingestor" "etl" "influx")
-          for MODULE in "${MODULES[@]}"; do
-            if [[ "${!MODULE}" == "true" ]]; then
-              echo "Running tests for $MODULE"
-              pytest --cov=$MODULE --cov-report=term-missing || true
-            fi
-          done
-
 
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -107,89 +61,33 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1  # Replace with your AWS region
 
+      - name: Log in to Amazon ECR
+        id: ecr-login
+        run: |
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY_URL }}
+      
       - name: Build and Push Docker Images for Changed Modules
         run: |
-          REPO_NAME=${{ secrets.DOCKER_USERNAME }}/towerwatch
-          MODULES=("mqtt" "heimdall" "mysql_ingestor" "jarvis" "influxdb_ingestor" "frontend")
-          
-          for MODULE in "${MODULES[@]}"; do
-            if [[ "${{ env.${MODULE} }}" == "true" ]]; then
-              echo "Building and pushing image for $MODULE"
-              docker-compose build ${MODULE}
-              docker tag ${MODULE}:latest ${REPO_NAME}-${MODULE}:${{ github.sha }}
-              docker push ${REPO_NAME}-${MODULE}:${{ github.sha }}
-            else
-              echo "No changes detected for $MODULE. Skipping."
-            fi
+          ECR_URL=${{ secrets.ECR_REPOSITORY_URL }}
+          for PROJECT in ${{ env.CHANGED_PROJECTS }}; do
+            echo "Building and pushing Docker image for $PROJECT"
+            docker-compose build ${PROJECT}
+            IMAGE_TAG=${ECR_URL}:${PROJECT}-${GITHUB_SHA}
+            docker tag ${PROJECT}:latest ${IMAGE_TAG}
+            docker push ${IMAGE_TAG}
           done
 
-      - name: Deploy to Kubernetes for Changed Modules
+      - name: Deploy to Kubernetes for Changed Projects
         run: |
-          MODULES=("mqtt" "heimdall" "mysql_ingestor" "etl" "influx" "frontend")
-          
-          for MODULE in "${MODULES[@]}"; do
-            if [[ "${{ env.${MODULE} }}" == "true" ]]; then
-              echo "Deploying updated $MODULE to Kubernetes"
-              kubectl apply -f ./k8s/${MODULE}-deployment.yaml
-              kubectl rollout status deployment/${MODULE}
-            else
-              echo "No changes detected for $MODULE. Skipping Kubernetes deployment."
-            fi
+          for PROJECT in ${{ env.CHANGED_PROJECTS }}; do
+            echo "Deploying $PROJECT to Kubernetes"
+            kubectl apply -f ./k8s/${PROJECT}-deployment.yaml
+            kubectl rollout status deployment/${PROJECT}
           done
-
-      # Docker Image Build
- #    - name: Log in to Docker Hub
-  #      uses: docker/login-action@v2
-  #      with:
-  #        username: ${{ secrets.DOCKER_USERNAME }}
-  #        password: ${{ secrets.DOCKER_PASSWORD }}
-
-      # Step 3: Build Images with Docker Compose
-  #    - name: Build Docker Images
-  #      run: |
-  #        docker-compose -f docker-compose.yml build
-
-      # Step 4: Tag and Push Images
- #     - name: Tag and Push Images
- #       run: |
-          # List of services to push
-  #        REPO_NAME=${{ secrets.DOCKER_USERNAME }}/towerwatch
-   #       SERVICES=("ingestor" "influx" "mqtt" "etl" "heimdall") 
-          
-  #        for SERVICE in "${SERVICES[@]}"; do
-  #        SOURCE_IMAGE=${SERVICE}:latest
-  #        TARGET_IMAGE=${REPO_NAME}-${SERVICE}:${{ github.sha }}
-
-          # Tag and push the specific image
-  #        docker tag ${SOURCE_IMAGE} ${TARGET_IMAGE}
-  #        docker push ${TARGET_IMAGE}
-
-          # Tag and push the latest image
-         # docker tag ${TARGET_IMAGE} ${REPO_NAME}-${SERVICE}:latest
-         # docker push ${REPO_NAME}-${SERVICE}:latest
-          #done
-
-
-      # Kubernetes Deployment
- #     - name: Set up kubectl
- #       uses: azure/setup-kubectl@v3
-  #      with:
-  #        version: 'v1.28.0'
-
-    #  - name: Authenticate to Kubernetes cluster
-   #     run: |
-   #       mkdir -p $HOME/.kube
-   #       echo "${{ secrets.KUBECONFIG }}" | base64 --decode > $HOME/.kube/config
-   #       cat $HOME/.kube/config
-    #      chmod 600 $HOME/.kube/config
-
-     # - name: Deploy to Kubernetes
-     #   run: |
-     #     kubectl apply -f ./k8s/deployment.yaml
-   #       kubectl rollout status deployment/TowerWatch 
