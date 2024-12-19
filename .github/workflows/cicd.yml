@@ -46,16 +46,16 @@ jobs:
 
       - name: Run Linting (Frontend)
         run: |
-          bazel run ./frontend:lint
-          bazel run ./frontend:format
+          bazel run //./frontend:lint
+          bazel run //./frontend:format
 
       - name: Run Linting (Backend)
         run: |
-          bazel run ./backend/mysql_ingestor:lint || true
-          bazel run ./backend/mqtt:lint || true
-          bazel run ./backend/heimdall:lint || true
-          bazel run ./backend/jarvis:lint || true
-          bazel run ./backend/influxdb_ingestor:lint || true
+          bazel run //./backend/mysql_ingestor:lint || true
+          bazel run //./backend/mqtt:lint || true
+          bazel run //./backend/heimdall:lint || true
+          bazel run //./backend/jarvis:lint || true
+          bazel run //./backend/influxdb_ingestor:lint || true
 
       - name: Run Security Checks (Backend)
         run: |
