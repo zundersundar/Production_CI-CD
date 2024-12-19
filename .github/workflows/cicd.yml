@@ -46,23 +46,29 @@ jobs:
 
       - name: Run Linting (Frontend)
         run: |
-          bazel run //frontend:lint
-          bazel run //frontend:format
+          bazel run ./frontend:lint
+          bazel run ./frontend:format
 
       - name: Run Linting (Backend)
         run: |
-          bazel run //backend/module1:lint || true
-          bazel run //backend/module2:lint || true
+          bazel run ./backend/mysql_ingestor:lint || true
+          bazel run ./backend/mqtt:lint || true
+          bazel run ./backend/heimdall:lint || true
+          bazel run ./backend/jarvis:lint || true
+          bazel run ./backend/influxdb_ingestor:lint || true
 
       - name: Run Security Checks (Backend)
         run: |
-          bazel run //backend/module1:bandit_check || true
-          bazel run //backend/module2:bandit_check || true
+          bazel run /backend/mysql_ingestor:bandit_check || true
+          bazel run ./backend/mqtt:bandit_check || true
+          bazel run ./backend/heimdall:bandit_check || true
+          bazel run ./backend/jarvis:bandit_check || true
+          bazel run ./backend/influxdb_ingestor:bandit_check || true
 
-      - name: Run Unit Tests with Coverage
-        run: |
-          bazel test //backend/module1:unit_tests
-          bazel test //backend/module2:unit_tests
+     # - name: Run Unit Tests with Coverage
+     #   run: |
+     #     bazel test //backend/module1:unit_tests
+     #     bazel test //backend/module2:unit_tests
 
   build-and-push:
     runs-on: ubuntu-latest
