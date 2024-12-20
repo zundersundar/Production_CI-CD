@@ -7,11 +7,6 @@ module(
 bazel_dep(name = "rules_python", version = "0.22.0")
 bazel_dep(name = "rules_nodejs", version = "5.3.0")
 
-# Register the modules
-package(
-    default_visibility = ["//visibility:public"]
-)
-
 # Register each module as part of the project
 bazel_dep(name = "frontend", version = "1.0.0")
 bazel_dep(name = "mysql_ingestor", version = "1.0.0")
@@ -19,4 +14,3 @@ bazel_dep(name = "mqtt", version = "1.0.0")
 bazel_dep(name = "jarvis", version = "1.0.0")
 bazel_dep(name = "heimdall", version = "1.0.0")
 bazel_dep(name = "influxdb_ingestor", version = "1.0.0")
-
