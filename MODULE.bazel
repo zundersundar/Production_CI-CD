@@ -7,10 +7,10 @@ module(
 bazel_dep(name = "rules_python", version = "0.22.0")
 bazel_dep(name = "rules_nodejs", version = "5.3.0")
 
-# Register each module as part of the project
-bazel_dep(name = "frontend", version = "1.0.0")
-bazel_dep(name = "mysql_ingestor", version = "1.0.0")
-bazel_dep(name = "mqtt", version = "1.0.0")
-bazel_dep(name = "jarvis", version = "1.0.0")
-bazel_dep(name = "heimdall", version = "1.0.0")
-bazel_dep(name = "influxdb_ingestor", version = "1.0.0")
+# Use local path overrides for project modules
+local_path_override(module_name = "frontend", path = "./frontend")
+local_path_override(module_name = "mysql_ingestor", path = "./mysql_ingestor")
+local_path_override(module_name = "mqtt", path = "./mqtt")
+local_path_override(module_name = "jarvis", path = "./jarvis")
+local_path_override(module_name = "heimdall", path = "./heimdall")
+local_path_override(module_name = "influxdb_ingestor", path = "./influxdb_ingestor")
