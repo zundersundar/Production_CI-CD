@@ -8,6 +8,6 @@ load("@build_bazel_rules_nodejs//:repositories.bzl", "nodejs_register_toolchains
 nodejs_register_toolchains()
 npm_install(
     name = "npm",
-    package_json = "//:package.json",
-    lock_file = "//:package-lock.json",
+    package_json = "//:./forntend/package.json",
+    lock_file = "//:./frontend/package-lock.json",
 )
