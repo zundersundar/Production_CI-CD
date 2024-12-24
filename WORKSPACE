@@ -22,13 +22,14 @@ http_archive(
 
 load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains", "npm_install")
 nodejs_register_toolchains()
+
 npm_install(
     name = "npm_deps",
     package_json = "//frontend:package.json",
     lockfile = "//frontend:package-lock.json",
 )
 
-# Declare the project modules
+# Register all the project modules for Bazel
 module(
     name = "my_project",
     version = "1.0.0",
@@ -37,10 +38,11 @@ module(
 bazel_dep(name = "rules_python", version = "0.22.0")
 bazel_dep(name = "rules_nodejs", version = "5.3.0")
 
-# Include all modules in the project
-bazel_dep(name = "frontend", version = "1.0.0")
-bazel_dep(name = "mqtt", version = "1.0.0")
-bazel_dep(name = "mysql_ingestor", version = "1.0.0")
-bazel_dep(name = "jarvis", version = "1.0.0")
-bazel_dep(name = "heimdall", version = "1.0.0")
-bazel_dep(name = "influxdb_ingestor", version = "1.0.0")
+# Local overrides for modules to ensure Bazel resolves the paths correctly
+local_path_override(module_name = "frontend", path = "./frontend")
+local_path_override(module_name = "mysql_ingestor", path = "./mysql_ingestor")
+local_path_override(module_name = "mqtt", path = "./mqtt")
+local_path_override(module_name = "jarvis", path = "./jarvis")
+local_path_override(module_name = "heimdall", path = "./heimdall")
+local_path_override(module_name = "influxdb_ingestor", path = "./influxdb_ingestor")
+
