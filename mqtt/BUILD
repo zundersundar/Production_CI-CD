@@ -1,6 +1,6 @@
 load("@rules_python//python:defs.bzl", "py_test", "py_binary")
 
-# Define lint rule
+#Pylibrary Define lint rule
 py_binary(
     name = "lint",
     srcs = glob(["mqtt_sub.py"]),
