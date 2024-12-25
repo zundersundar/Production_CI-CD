@@ -1,4 +1,4 @@
-name: CI/CD Towerwatch
+name: CI/CD Controller Workflow
 
 on:
   pull_request:
@@ -7,122 +7,67 @@ on:
   push:
     branches:
       - main
-  
+
 jobs:
-  setup:
+  distribute-triggers:
+    name: Distribute Triggers to Module Workflows
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Install Bazel
+      - name: Determine Changed Modules
+        id: changed-modules
         run: |
-          BAZEL_VERSION=8.0.0
-          wget https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-linux-x86_64
-          chmod +x bazel-${BAZEL_VERSION}-linux-x86_64
-          sudo mv bazel-${BAZEL_VERSION}-linux-x86_64 /usr/local/bin/bazel
-          bazel version
+          MODULES=""
+          if git diff --name-only HEAD~1 HEAD | grep -q '^frontend/'; then
+            MODULES="$MODULES frontend"
+          fi
+          if git diff --name-only HEAD~1 HEAD | grep -q '^mysql_ingestor/'; then
+            MODULES="$MODULES mysql_ingestor"
+          fi
+          
+          if git diff --name-only HEAD~1 HEAD | grep -q '^mqtt/'; then
+            MODULES="$MODULES mqtt"
+          
+          fi 
+          
+          if git diff --name-only HEAD~1 HEAD | grep -q '^jarvis/'; then
+            MODULES="$MODULES jarvis"
 
-      - name: Install Dependencies
-        run: |
-          # Install Python and Node.js dependencies
-          sudo apt install -y python3-pip
-          pip3 install pylint bandit pytest pytest-cov
-          npm ci --prefix frontend
+          fi
+          
+          if git diff --name-only HEAD~1 HEAD | grep -q '^heimdall/'; then
+            MODULES="$MODULES heimdall"
 
-      - name: Install Dependencies
-        run: |
-          # Install Node.js and Python dependencies
-          sudo apt-get update && sudo apt-get install -y python3-pip
-          pip3 install pylint bandit pytest pytest-cov
-          npm ci --prefix frontend
+          fi
+          
+          if git diff --name-only HEAD~1 HEAD | grep -q '^influxdb_ingestor/'; then
+            MODULES="$MODULES influxdb_ingestor"
+          fi
+          echo "::set-output name=modules::$MODULES"
 
-  lint-and-test:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Run Linting (Frontend)
-        run: |
-          bazel run //./frontend:lint
-          bazel run //./frontend:format
-
-      - name: Run Linting (Backend)
-        run: |
-          bazel run //./backend/mysql_ingestor:lint || true
-          bazel run //./backend/mqtt:lint || true
-          bazel run //./backend/heimdall:lint || true
-          bazel run //./backend/jarvis:lint || true
-          bazel run //./backend/influxdb_ingestor:lint || true
-
-      - name: Run Security Checks (Backend)
-        run: |
-          bazel run /backend/mysql_ingestor:bandit_check || true
-          bazel run ./backend/mqtt:bandit_check || true
-          bazel run ./backend/heimdall:bandit_check || true
-          bazel run ./backend/jarvis:bandit_check || true
-          bazel run ./backend/influxdb_ingestor:bandit_check || true
-
-     # - name: Run Unit Tests with Coverage
-     #   run: |
-     #     bazel test //backend/module1:unit_tests
-     #     bazel test //backend/module2:unit_tests
-
-  build-and-push:
-    runs-on: ubuntu-latest
-    needs: lint-and-test
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v3
+      - name: Trigger Frontend Workflow
+        if: contains(steps.changed-modules.outputs.modules, 'frontend')
+        uses: actions/github-script@v6
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          script: |
+            const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+            await github.actions.createWorkflowDispatch({
+              owner,
+              repo,
+              workflow_id: "ci_cd_react_ecr.yml",
+              ref: "main"
+            });
 
-      - name: Authenticate with AWS ECR
-        run: |
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <AWS_ECR_REPO>
-
-      - name: Build and Push Docker Images (Backend)
-        run: |
-          if bazel query 'kind("docker_build", //backend/module1:*)' | grep -q "module1_image"; then
-            bazel run //backend/module1:module1_image -- --push
-          fi
-          if bazel query 'kind("docker_build", //backend/module2:*)' | grep -q "module2_image"; then
-            bazel run //backend/module2:module2_image -- --push
-          fi
-
-      - name: Build and Push Docker Images (Frontend)
-        run: |
-          if bazel query 'kind("docker_build", //frontend:*)' | grep -q "frontend_image"; then
-            bazel run //frontend:frontend_image -- --push
-          fi
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build-and-push
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Set Up kubectl
-        uses: azure/setup-kubectl@v3
+      - name: Trigger Backend Workflow
+        if: contains(steps.changed-modules.outputs.modules, 'backend')
+        uses: actions/github-script@v6
         with:
-          version: 'latest'
+          script: |
+            const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+            await github.actions.createWorkflowDispatch({
+              owner,
+              repo,
+              workflow_id: "ci_cd_python_ecr.yml",
+              ref: "main"
+            });
 
-      - name: Deploy to Kubernetes
-        env:
-          KUBECONFIG: ${{ secrets.KUBECONFIG }}
-        run: |
-          # Update the Kubernetes deployment with the new images
-          kubectl set image deployment/backend-module1 module1-container=<AWS_ECR_REPO>/module1:${GITHUB_SHA}
-          kubectl set image deployment/backend-module2 module2-container=<AWS_ECR_REPO>/module2:${GITHUB_SHA}
-          kubectl set image deployment/frontend frontend-container=<AWS_ECR_REPO>/frontend:${GITHUB_SHA}
-          kubectl rollout status deployment/backend-module1
-          kubectl rollout status deployment/backend-module2
-          kubectl rollout status deployment/frontend
