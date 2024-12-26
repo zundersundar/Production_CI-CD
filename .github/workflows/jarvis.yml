@@ -3,7 +3,8 @@ name: CI/CD Pipeline for Python Backend
 on:
   push:
     paths:
-      - './jarvis'
+      - './jarvis/**'
+  workflow_dispatch:
 
 jobs:
   lint-and-test:
@@ -62,7 +63,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Build Docker Image
-        working-directory: backend
+        working-directory: ./jarvis
         run: |
           IMAGE_TAG=$(git rev-parse --short HEAD)
           docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:$IMAGE_TAG .
