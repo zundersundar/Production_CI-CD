@@ -3,9 +3,7 @@ name: CI/CD Pipeline for React Frontend
 on:
   push:
     paths:
-      - './frontend/**'
-    branches: 
-      - main
+      - './frontend/**'      
   workflow_dispatch:
 
 jobs:
