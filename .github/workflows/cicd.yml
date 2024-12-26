@@ -59,7 +59,7 @@ jobs:
             await github.rest.actions.createWorkflowDispatch({
               owner,
               repo,
-              workflow_id: "ci_cd_react_ecr.yml",
+              workflow_id: "frontend.yml",
               ref: "main"
             });
 
