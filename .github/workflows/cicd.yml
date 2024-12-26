@@ -56,7 +56,7 @@ jobs:
         with:
           script: |
             const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
-            await github.actions.createWorkflowDispatch({
+            await github.rest.actions.createWorkflowDispatch({
               owner,
               repo,
               workflow_id: "ci_cd_react_ecr.yml",
@@ -69,7 +69,7 @@ jobs:
         with:
           script: |
             const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
-            await github.actions.createWorkflowDispatch({
+            await github.rest.actions.createWorkflowDispatch({
               owner,
               repo,
               workflow_id: "mysql_ingestor.yml",
@@ -96,7 +96,7 @@ jobs:
         with:
           script: |
             const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
-            await github.actions.createWorkflowDispatch({
+            await github.rest.actions.createWorkflowDispatch({
               owner,
               repo,
               workflow_id: "jarvis.yml",
@@ -110,7 +110,7 @@ jobs:
         with:
           script: |
             const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
-            await github.actions.createWorkflowDispatch({
+            await github.rest.actions.createWorkflowDispatch({
               owner,
               repo,
               workflow_id: "heimdall.yml",
@@ -125,7 +125,7 @@ jobs:
         with:
           script: |
             const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
-            await github.actions.createWorkflowDispatch({
+            await github.rest.actions.createWorkflowDispatch({
               owner,
               repo,
               workflow_id: "influxdb_ingestor.yml",
