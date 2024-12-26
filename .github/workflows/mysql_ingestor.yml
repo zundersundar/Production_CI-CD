@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - './mysql_ingestor/**'
+  workflow_dispatch:
 
 jobs:
   lint-and-test:
     name: Lint, Security Check, and Test Python Backend
     runs-on: ubuntu-latest
+  
 
     steps:
       - name: Checkout Code
