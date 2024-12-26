@@ -3,7 +3,8 @@ name: CI/CD Pipeline for Python Backend
 on:
   push:
     paths:
-      - './influxdb_ingestor'
+      - './influxdb_ingestor/**'
+  workflow_dispatch:
 
 jobs:
   lint-and-test:
@@ -62,7 +63,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Build Docker Image
-        working-directory: backend
+        working-directory: ./influxdb_ingestor
         run: |
           IMAGE_TAG=$(git rev-parse --short HEAD)
           docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:$IMAGE_TAG .
@@ -72,10 +73,10 @@ jobs:
           IMAGE_TAG=$(git rev-parse --short HEAD)
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:$IMAGE_TAG
 
-      - name: Update Kubernetes Deployment
-        env:
-          IMAGE_TAG: $(git rev-parse --short HEAD)
-          IMAGE_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:$IMAGE_TAG
-        run: |
-          kubectl set image deployment/${{ secrets.K8S_DEPLOYMENT_NAME }} \
-          ${{ secrets.K8S_CONTAINER_NAME }}=$IMAGE_URI --namespace=${{ secrets.K8S_NAMESPACE }}
+ #     - name: Update Kubernetes Deployment
+ #       env:
+ #         IMAGE_TAG: $(git rev-parse --short HEAD)
+ #         IMAGE_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:$IMAGE_TAG
+ #       run: |
+ #         kubectl set image deployment/${{ secrets.K8S_DEPLOYMENT_NAME }} \
+ #         ${{ secrets.K8S_CONTAINER_NAME }}=$IMAGE_URI --namespace=${{ secrets.K8S_NAMESPACE }}
