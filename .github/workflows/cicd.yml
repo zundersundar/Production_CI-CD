@@ -82,7 +82,7 @@ jobs:
         with:
           script: |
             const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
-            await github.actions.createWorkflowDispatch({
+            await github.rest.actions.createWorkflowDispatch({
               owner,
               repo,
               workflow_id: "mqtt.yml",
