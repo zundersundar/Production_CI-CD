@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb_ingestor
+  namespace: Towerwatch  
+  labels:
+    app: influxdb_ingestor
+spec:
+  replicas: 2  
+  template:
+    metadata:
+      labels:
+        app: heimdall
+    spec:
+      containers:
+      - name: influxdb_ingestor
+        image: <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/<REPOSITORY_NAME>:<GITHUB_SHA>
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9000 
+   #     env:
+   #     - name: ENV_VAR_1  
+   #       value: "value1"
+   #     - name: ENV_VAR_2
+   #       value: "value2"
