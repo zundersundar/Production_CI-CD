@@ -1,4 +1,4 @@
-name: CI/CD Pipeline for Python Backend
+name: CI/CD Pipeline for influxdb_ingestor
 
 on:
   push:
