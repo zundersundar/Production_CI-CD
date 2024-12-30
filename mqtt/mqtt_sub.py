@@ -29,7 +29,7 @@ mqtt_etl_handler_queue = {
     'url' : 'https://sqs.eu-west-1.amazonaws.com/009925156537/mqtt_etl_handler_queue'
 }
 
-printf("Welcome to towerwatch")
+
 
 class Topic:
     def __init__(self, customer_name, site_name, building_name, topic_name):
