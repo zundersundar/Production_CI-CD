@@ -95,7 +95,10 @@ jobs:
           IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:jarvis-$IMAGE_TAG
 
           sed -i "s|image: .*|image: $IMAGE_URI|g" jarvis-deployment.yml
-          cat jarvis-deployment.yml
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add jarvis-deployment.yml
+          git commit -m "Update deployment image to $IMAGE_URI"
 
 
       - name: Update Kubernetes Deployment
