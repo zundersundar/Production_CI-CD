@@ -95,6 +95,7 @@ jobs:
           IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:jarvis-$IMAGE_TAG
 
           sed -i "s|image: .*|image: $IMAGE_URI|g" jarvis-deployment.yml
+          cat jarvis-deployment.yml
 
 
       - name: Update Kubernetes Deployment
