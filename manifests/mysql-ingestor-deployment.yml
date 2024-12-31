@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deployment.yml
+  namespace: Towerwatch  
+  labels:
+    app: mysql-deployment.yml
+spec:
+  replicas: 2  
+  template:
+    metadata:
+      labels:
+        app: mysql-deployment.yml
+    spec:
+      containers:
+      - name: mysql-deployment.yml
+        image: <IMAGE_URI>
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000 

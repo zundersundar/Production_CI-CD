@@ -87,6 +87,22 @@ jobs:
         run: |
           IMAGE_TAG=${GITHUB_SHA:0:7}
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:influxdb_ingestor-$IMAGE_TAG
+     
+      - name: Update in INFLUX Deployment file
+        working-directory: ./manifests
+        run: |
+          IMAGE_TAG=${GITHUB_SHA:0:7}
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:influxdb_ingestor-$IMAGE_TAG
+
+          sed -i "s|image: .*|image: $IMAGE_URI|g" influxdb-ingestor-deployment.yml
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add influxdb-ingestor-deployment.yml
+          git commit -m "Update deployment image to $IMAGE_URI"
+
+      - name: Push Changes
+        run: |
+          git push origin ${{ github.ref }}
 
       - name: Update Kubernetes Deployment
         env:

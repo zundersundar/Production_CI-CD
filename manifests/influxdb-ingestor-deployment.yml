@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb-ingestor
+  namespace: Towerwatch  
+  labels:
+    app: influxdb-ingestor
+spec:
+  replicas: 2  
+  template:
+    metadata:
+      labels:
+        app: influxdb-ingestor
+    spec:
+      containers:
+      - name: influxdb-ingestor
+        image: <IMAGE_URI>
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9000 

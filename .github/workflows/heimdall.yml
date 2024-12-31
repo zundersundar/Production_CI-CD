@@ -89,13 +89,21 @@ jobs:
           IMAGE_TAG=${GITHUB_SHA:0:7}
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:heimdall-$IMAGE_TAG
 
-      - name: Update Kubernetes Deployment
+      - name: Update HEIMDALL Deployment file
         working-directory: ./manifests
         run: |
           IMAGE_TAG=${GITHUB_SHA:0:7}
-          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:jarvis-$IMAGE_TAG
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:heimdall-$IMAGE_TAG
 
-          sed -i "s|image: .*|image: $IMAGE_URI|g" jarvis-deployment.yml
+          sed -i "s|image: .*|image: $IMAGE_URI|g" heimdall-deployment.yml
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add heimdall-deployment.yml
+          git commit -m "Update deployment image to $IMAGE_URI"
+
+      - name: Push Changes
+        run: |
+          git push origin ${{ github.ref }}
 
       - name: Update Kubernetes Deployment
         env:
