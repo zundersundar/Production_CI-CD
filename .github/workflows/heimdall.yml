@@ -34,6 +34,21 @@ jobs:
         working-directory: ./heimdall
         run: pylint **/*.py || true
 
+      - name: Install Vulture
+        working-directory: ./heimdall
+        run: pip install vulture
+
+      - name: Run Vulture
+        run: vulture . --min-confidence 80 || true # Adjust confidence level as needed
+ 
+   #   - name: Upload Vulture Report
+   #     if: always()
+   #     run: |
+   #      vulture . > vulture_report.txt
+   #      artifacts:
+   #      name: vulture-report
+   #      path: vulture_report.txt
+
       - name: Run Bandit
         working-directory: ./heimdall
         run: bandit -r . || true
