@@ -2,15 +2,9 @@ name: CI/CD Pipeline for Heimdall
 
 on:
   push:
-    branches:
-      - main 
     paths:
-      - './heimdall/**' 
-  pull_request:
-    branches:
-      - main 
-    paths:
-      - './heimdall/**' 
+      - './heimdall/**'      
+  workflow_dispatch: 
 
 jobs:
   lint-and-test:
