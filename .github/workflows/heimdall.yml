@@ -2,8 +2,15 @@ name: CI/CD Pipeline for Heimdall
 
 on:
   push:
+    branches:
+      - main 
     paths:
-      - './heimdall/**'
+      - './heimdall/**' 
+  pull_request:
+    branches:
+      - main 
+    paths:
+      - './heimdall/**' 
   workflow_dispatch:
 
 jobs:
