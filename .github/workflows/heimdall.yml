@@ -90,6 +90,14 @@ jobs:
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:heimdall-$IMAGE_TAG
 
       - name: Update Kubernetes Deployment
+        working-directory: ./manifests
+        run: |
+          IMAGE_TAG=${GITHUB_SHA:0:7}
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:jarvis-$IMAGE_TAG
+
+          sed -i "s|image: .*|image: $IMAGE_URI|g" jarvis-deployment.yml
+
+      - name: Update Kubernetes Deployment
         env:
           IMAGE_TAG: ${GITHUB_SHA:0:7}
           IMAGE_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:heimdall-$IMAGE_TAG

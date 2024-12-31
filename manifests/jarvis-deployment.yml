@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jarvis
+  namespace: Towerwatch  
+  labels:
+    app: jarvis
+spec:
+  replicas: 2  
+  template:
+    metadata:
+      labels:
+        app: jarvis
+    spec:
+      containers:
+      - name: jarvis
+        image: <IMAGE_URI>
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6000 
+   #     env:
+   #     - name: ENV_VAR_1  
+   #       value: "value1"
+   #     - name: ENV_VAR_2
+   #       value: "value2"

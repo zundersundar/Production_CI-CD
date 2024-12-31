@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: heimdall
+  namespace: Towerwatch  
+  labels:
+    app: heimdall
+spec:
+  replicas: 2  
+  template:
+    metadata:
+      labels:
+        app: heimdall
+    spec:
+      containers:
+      - name: heimdall
+        image: <IMAGE_URI>
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 7000 
