@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql-deployment.yml
-  namespace: Towerwatch  
+  namespace: towerwatch  
   labels:
     app: mysql-deployment.yml
 spec:

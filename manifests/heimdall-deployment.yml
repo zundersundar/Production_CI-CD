@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: heimdall
-  namespace: Towerwatch  
+  namespace: towerwatch  
   labels:
     app: heimdall
 spec:

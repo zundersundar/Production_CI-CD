@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jarvis
-  namespace: Towerwatch  
+  namespace: towerwatch  
   labels:
     app: jarvis
 spec:

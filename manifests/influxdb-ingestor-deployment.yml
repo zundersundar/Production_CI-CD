@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: influxdb-ingestor
-  namespace: Towerwatch  
+  namespace: towerwatch  
   labels:
     app: influxdb-ingestor
 spec:
