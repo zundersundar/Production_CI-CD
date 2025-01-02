@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: influxdb-ingestor
-        image: <IMAGE_URI>
+        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch:influxdb_ingestor-810b502
         imagePullPolicy: Always
         ports:
         - containerPort: 9000 
