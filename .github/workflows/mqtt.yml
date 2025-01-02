@@ -95,6 +95,7 @@ jobs:
           sed -i "s|image: .*|image: $IMAGE_URI|g" mqtt-deployment.yml
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
+          git pull
           git add mqtt-deployment.yml
           git commit -m "Update deployment image to $IMAGE_URI"
 
