@@ -2,24 +2,22 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jarvis
-  namespace: towerwatch  
+  namespace: towerwatch
   labels:
     app: jarvis
 spec:
-  replicas: 2  
+  replicas: 2
+  selector:  
+    matchLabels:
+      app: jarvis
   template:
     metadata:
       labels:
-        app: jarvis
+        app: jarvis  
     spec:
       containers:
       - name: jarvis
         image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch:jarvis-541714b
         imagePullPolicy: Always
         ports:
-        - containerPort: 6000 
-   #     env:
-   #     - name: ENV_VAR_1  
-   #       value: "value1"
-   #     - name: ENV_VAR_2
-   #       value: "value2"
+        - containerPort: 6000
