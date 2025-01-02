@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: mysql-deployment.yml
-        image: <IMAGE_URI>
+        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch:mysql_ingestor-f1e26df
         imagePullPolicy: Always
         ports:
         - containerPort: 8000 
