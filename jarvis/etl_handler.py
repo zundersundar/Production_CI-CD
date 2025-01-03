@@ -15,12 +15,31 @@ from heimdall_tools.vault import get_vault_secrets
 app = Flask(__name__)
 redis_server_ip = None
 redis_conn = None
-#mysql_ingestor_url = 'http://127.0.0.1:8000'
-mysql_ingestor_url = 'http:// mysql_ingestor:8000'
-etl_heimdall_handler_queue = {
-    'region' : 'eu-west-1',
-    'url' : 'https://sqs.eu-west-1.amazonaws.com/009925156537/etl-to-heimdall'
-}
+mysql_ingestor_url = None
+etl_heimdall_handler_queue = None
+
+def set_server_details():
+    load_dotenv()
+    global redis_server_ip, redis_conn, etl_heimdall_handler_queue, mysql_ingestor_url, heimdall_handler_url
+    common_secrets, user_secrets= get_vault_secrets(
+        os.getenv('VAULT_ADDR'),os.getenv('VAULT_USER_SECRETS_PATH'),
+        os.getenv('VAULT_USERNAME'),os.getenv('VAULT_PASSWORD')
+    )
+
+    redis_server_ip = common_secrets.get('REDIS_SERVER_IP')
+    redis_conn = get_redis_connection(host_name = redis_server_ip)
+    mysql_ingestor_url = user_secrets.get('MYSQL_INGESTOR_URL')
+    etl_heimdall_handler_queue = {
+        'region' : user_secrets.get('ETL_HEIMDALL_HANDLER_QUEUE_REGION'),
+        'url' : user_secrets.get('ETL_HEIMDALL_HANDLER_QUEUE_URL')
+    }
+
+    # DONOT SEND PRODUCTION IP in DATA. Retrieve Production from Environment variable in Lambda
+    if os.getenv('ENVIRONMENT') != "PRODUCTION":
+        heimdall_handler_url = user_secrets.get('HEIMDALL_HANDLER_URL')
+    
+    print(f"Set queue url: {etl_heimdall_handler_queue['url']}, heimdall_handler_url: {heimdall_handler_url}")
+
 
 def read_sensor_id_and_value(sensor_data):
     read_sensor_id_value_endpoint = (
@@ -56,11 +75,11 @@ def read_sensor_id_and_value(sensor_data):
     except Exception as e:
         print(f"{str(e)} : Error occured in read_sensor_id_and_value Endpoint. Please Debug. Cannot Go Further")
         
-    return -1
+    return None
 
 # TODO Redesign to handle data process more asynchronously
 def etl_thread(sensor_data):
-    global redis_server_ip, redis_conn
+    global redis_conn, etl_heimdall_handler_queue
     #sensor_data = json.loads(sensor_data)
     print (sensor_data["customer_name"], sensor_data["site_name"], sensor_data["building_name"])
 
@@ -70,11 +89,11 @@ def etl_thread(sensor_data):
     last_updated = current_time_str    
 
     customer_name, site_name, building_name = sensor_data["customer_name"], sensor_data["site_name"], sensor_data["building_name"] 
-    floor_position = sensor_data["floor_position"]
-    sensor_type = sensor_data["sensor_type"]
-    sensor_name = sensor_data["sensor_name"]
-    sensor_value = sensor_data["value"]
-    sensor_data['last_updated'] = last_updated
+    floor_position = int(sensor_data["floor_position"])
+    sensor_type = str(sensor_data["sensor_type"])
+    sensor_name = str(sensor_data["sensor_name"])
+    sensor_value = float(sensor_data["value"])
+    sensor_data['last_updated'] = str(last_updated)
 
     # Read last updated value from Redis
     redis_sensor_value_key = f"{customer_name}/{site_name}/{building_name}/{floor_position}/{sensor_type}/{sensor_name}/sensor_value"
@@ -82,7 +101,7 @@ def etl_thread(sensor_data):
     prev_sensor_value = get_from_cache(redis_conn, redis_sensor_value_key)
     print(f"TW_DBG, Customer Name: {customer_name}, Site: {site_name}, Building: {building_name}, floor: {floor_position}, Type: {sensor_type}, prev_sensor_value: {prev_sensor_value}, value: {sensor_value}")
     if prev_sensor_value is not None:
-        prev_sensor_value = int(prev_sensor_value.decode())
+        prev_sensor_value = float((prev_sensor_value.decode()))
 
     sensor_id = get_from_cache(redis_conn, redis_sensor_id_key)
     if sensor_id is not None:
@@ -90,27 +109,26 @@ def etl_thread(sensor_data):
 
     # Read from DB if there is a cache miss
     if prev_sensor_value is None or sensor_id is None:
-        sensor_data['customer_name'] = customer_name
-        sensor_data['site_name'] = site_name
-        sensor_data['building_name'] = building_name
+        sensor_data['customer_name'] = str(customer_name)
+        sensor_data['site_name'] = str(site_name)
+        sensor_data['building_name'] = str(building_name)
         response = read_sensor_id_and_value(sensor_data)
         if response is not None:
             # Extract sensor_value
-            prev_sensor_value = response['value']
-            sensor_id = response['sensor_id']
+            prev_sensor_value = float(response['value'])
+            sensor_id = int(response['sensor_id'])
             set_with_expiry(redis_conn, redis_sensor_id_key, sensor_id, expiry_time=5)
         elif response is None:
             #Looks like a new Sensor is added in the Site
             print("TW_DBG, Looks like a new sensor is added in the site. Adding to Heimdall Memory")
-            #TODO We shouldn't add a sensor value to DB if the sensor configuration is not added by a technician in configuration page. 
-            # This will cause discrepency in Floor plan metrics visualization and Dashboard
+            #TODO We shouldn't add a sensor value to DB if the sensor configuration is not added by a technician in configuration page. This will cause discrepency in Floor plan metrics visualization and Dashboard
             return
         elif response == -1:
             print("TW_DBG, Exception while reading sensor_id_value")
             return
         
     sensor_data['sensor_id'] = sensor_id
-    sensor_data['prev_value'] = prev_sensor_value
+    sensor_data['prev_sensor_value'] = prev_sensor_value
     print(f"TW_DBG, Redis Sensor value Key: [{redis_sensor_value_key}], sensor_id: [{sensor_id}], Prev Sensor Value: [{prev_sensor_value}], Sensor new value: [{sensor_value}]")
 
     #THE BELOW CODE IS FOR VERIFYING. DELETE IT FOR PRODUCTION
@@ -124,10 +142,13 @@ def etl_thread(sensor_data):
     # 2. Validate unit of value
     # 3. Add ML data scaling if required
     print("Writing data to ETL HEIMDALL Queue")
+    if heimdall_handler_url is not None:
+        sensor_data['heimdall_handler_url'] = heimdall_handler_url
     result = write_to_sqs_queue (
         region = etl_heimdall_handler_queue['region'],
         queue_url = etl_heimdall_handler_queue['url'],
-        message_body = json.dumps(sensor_data)
+        message_body = sensor_data
+        #message_body = json.dumps(sensor_data)
     )
 
 
@@ -142,14 +163,7 @@ def etl_process():
     return 'API call submitted', 200
 
 def main():
-    load_dotenv()
-    global redis_server_ip, redis_conn
-    common_secrets, user_secrets= get_vault_secrets(
-        os.getenv('VAULT_ADDR'),os.getenv('VAULT_USER_SECRETS_PATH'),
-        os.getenv('VAULT_USERNAME'),os.getenv('VAULT_PASSWORD')
-    )
-    redis_server_ip = common_secrets.get('REDIS_SERVER_IP')
-    redis_conn = get_redis_connection(host_name = redis_server_ip)
+    set_server_details()
     app.run(host='0.0.0.0', port=6000)
 
 if __name__ == "__main__":
