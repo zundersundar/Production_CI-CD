@@ -18,3 +18,24 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 7000 
+      imagePullSecrets:
+      - name: ecr-pull-secret
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: heimdall-service
+  namespace: towerwatch
+  labels:
+    app: heimdall
+spec:
+  selector:
+    app: heimdall # Matches the Pod labels
+  ports:
+    - protocol: TCP
+      port: 7000         # The port exposed by the Service
+      targetPort: 7000 # The containerPort in the Pod
+  type: ClusterIP      

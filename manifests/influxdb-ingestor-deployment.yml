@@ -18,3 +18,24 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 9000 
+      imagePullSecrets:
+      - name: ecr-pull-secret
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: influxdb-ingestor
+  namespace: towerwatch
+  labels:
+    app: influxdb-ingestor
+spec:
+  selector:
+    app: influxdb-ingestor # Matches the Pod labels
+  ports:
+    - protocol: TCP
+      port: 9000         # The port exposed by the Service
+      targetPort: 9000 # The containerPort in the Pod
+  type: ClusterIP   
