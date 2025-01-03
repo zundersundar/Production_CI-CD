@@ -82,18 +82,18 @@ jobs:
         working-directory: ./heimdall
         run: |
           IMAGE_TAG=${GITHUB_SHA:0:7}
-          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:heimdall-$IMAGE_TAG .
+          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.HEIMDALL }}:heimdall-$IMAGE_TAG .
 
       - name: Push Docker Image to ECR
         run: |
           IMAGE_TAG=${GITHUB_SHA:0:7}
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:heimdall-$IMAGE_TAG
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.HEIMDALL }}:heimdall-$IMAGE_TAG
 
       - name: Update HEIMDALL Deployment file
         working-directory: ./manifests
         run: |
           IMAGE_TAG=${GITHUB_SHA:0:7}
-          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:heimdall-$IMAGE_TAG
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.HEIMDALL }}:heimdall-$IMAGE_TAG
 
           sed -i "s|image: .*|image: $IMAGE_URI|g" heimdall-deployment.yml
           git config user.name "GitHub Actions"
@@ -109,7 +109,7 @@ jobs:
       - name: Update Kubernetes Deployment
         env:
           IMAGE_TAG: ${GITHUB_SHA:0:7}
-          IMAGE_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.REPOSITORY_NAME }}:heimdall-$IMAGE_TAG
+          IMAGE_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.HEIMDALL }}:heimdall-$IMAGE_TAG
         run: |
     
           sed -i "s|<AWS_ACCOUNT_ID>|${{ secrets.AWS_ACCOUNT_ID }}|g" deployment.yaml
