@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: jarvis
-        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch:jarvis-541714b
+        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-jarvis:jarvis-806fa2d
         imagePullPolicy: Always
         ports:
         - containerPort: 6000
