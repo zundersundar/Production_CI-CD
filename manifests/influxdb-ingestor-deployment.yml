@@ -19,7 +19,7 @@ spec:
         ports:
         - containerPort: 9000 
       imagePullSecrets:
-      - name: ecr-pull-secret
+      - name: ecr-docker-secret
 
 
 ---
