@@ -6,7 +6,10 @@ metadata:
   labels:
     app: influxdb-ingestor
 spec:
-  replicas: 2  
+  replicas: 2
+  selector:  
+    matchLabels:
+      app: influxdb-ingestor
   template:
     metadata:
       labels:

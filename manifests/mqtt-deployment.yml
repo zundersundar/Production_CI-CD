@@ -6,11 +6,15 @@ metadata:
   labels:
     app: mqtt
 spec:
-  replicas: 2  
+  replicas: 2
+  selector:  
+    matchLabels:
+      app: mqtt
   template:
     metadata:
       labels:
-        app: mqtt
+        app: mqtt 
+
     spec:
       containers:
       - name: mqtt
