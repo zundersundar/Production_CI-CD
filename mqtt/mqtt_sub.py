@@ -1,4 +1,6 @@
 import sys
+import requests, os, json
+
 sys.path.append('./')
 import paho.mqtt.client as mqtt
 import random
@@ -9,26 +11,15 @@ from heimdall_tools.redis_client import set_with_expiry
 from heimdall_tools.redis_client import get_from_cache
 from flask import Flask, jsonify
 from dotenv import load_dotenv
-import requests, os
 from heimdall_tools.vault import get_vault_secrets
 import time 
 
 app = Flask(__name__)
 mqtt_topic_names = []
-#mysql_ingestor_url = 'http://127.0.0.1:8000'
-mysql_ingestor_url='http://mysql-ingestor:8000'
-#TODO Read it from DB 
-mqtt_listener_sns = {
-    "arn" : "arn:aws:sns:eu-west-1:009925156537:mqtt_listener",
-    "region" : "eu-west-1",
-    "topic" : "mqtt_listener"
-    }
-
-mqtt_etl_handler_queue = {
-    'region' : 'eu-west-1',
-    'url' : 'https://sqs.eu-west-1.amazonaws.com/009925156537/mqtt_etl_handler_queue'
-}
-
+mysql_ingestor_url = None
+redis_server_ip = None
+mqtt_etl_handler_queue = None
+etl_handler_url = None
 
 
 class Topic:
@@ -47,16 +38,9 @@ class mqtt:
 #TODO: Implement persistent session logic. 
 class CHDB_MQTT_SUB:
     def __init__(self, broker, port_number):
-        load_dotenv()
-        common_secrets, user_secrets= get_vault_secrets(
-            os.getenv('VAULT_ADDR'),os.getenv('VAULT_USER_SECRETS_PATH'),
-            os.getenv('VAULT_USERNAME'),os.getenv('VAULT_PASSWORD')
-        )
         self.client = None
         self.mqtt_broker = broker
         self.port_number = port_number
-        self.redis_server_ip = common_secrets.get('REDIS_SERVER_IP')
-        print(self.redis_server_ip)
         
     def connect_mqtt(self):
         def on_connect(client, userdata, flags, rc):
@@ -76,12 +60,12 @@ class CHDB_MQTT_SUB:
 
     def on_log(client, userdata, level, buf):
         print("log: ",buf)
-        
+    
 
     #TODO Add a logic to add new topic names if a new customer is added. This api is getting called only during bootup atm
     def check_mqtt_topic_names(self) -> int:
-        redis_conn = get_redis_connection(host_name = self.redis_server_ip)
-        print(self.redis_server_ip)
+        global redis_server_ip, mysql_ingestor_url
+        redis_conn = get_redis_connection(host_name = redis_server_ip)
         mqtt_topic_names_read_required = get_from_cache(redis_conn, "mqtt_topic_names_read_required")
         if mqtt_topic_names_read_required is not None:
             # Decode the byte string to a regular string
@@ -119,6 +103,8 @@ class CHDB_MQTT_SUB:
     def subscribe(self):
         def mqtt_read_topics(client, userdata, message) -> None:
             def send_to_mqtt_listener(value):
+                global mqtt_etl_handler_queue, etl_handler_url
+                value['etl_handler_url'] = etl_handler_url
                 print(f'Value:{value}')
                 try:
                     response = write_to_sqs_queue(
@@ -126,18 +112,15 @@ class CHDB_MQTT_SUB:
                         queue_url = mqtt_etl_handler_queue['url'],
                         message_body = value
                     )
-                    # response = post_to_sns_topic(region = mqtt_listener_sns['region'],
-                    #                              arn = mqtt_listener_sns['arn'],
-                    #                              topic = mqtt_listener_sns['topic'],
-                    #                              key = key,
-                    #                              value = value)
                 except Exception as e:
                     print("Exception occured", e)
                     return None                
 
-            print(f"received message: to topic {message.topic}")
-            print(str(message.payload.decode("utf-8")))
-            send_to_mqtt_listener(value = str(message.payload.decode("utf-8")))
+            print(f"received message: to topic {message.topic}, payload: {message.payload}")
+            mqtt_message = json.loads(message.payload.decode("utf-8"))
+
+            send_to_mqtt_listener(value = mqtt_message)
+            #send_to_mqtt_listener(value = str(message.payload.decode("utf-8")))
             # ********** MQTT READ TOPICS FUNC END **********
         print(f"Configured topic names are {mqtt_topic_names}")
         for topic in mqtt_topic_names:
@@ -153,46 +136,53 @@ class CHDB_MQTT_SUB:
 #This api shall be called in case a new topic is added to DB. For eg: a new customer site is added in the system
 #@app.route('/refresh_heimdall_topic_names', methods=['POST'])
 def refresh_heimdall_topic_names():
-    load_dotenv()
-    common_secrets, user_secrets= get_vault_secrets(
-        os.getenv('VAULT_ADDR'),os.getenv('VAULT_USER_SECRETS_PATH'),
-        os.getenv('VAULT_USERNAME'),os.getenv('VAULT_PASSWORD')
-    )
-    print("refresh_heimdall_topic_names API Called")
-    redis_server_ip = common_secrets.get('REDIS_SERVER_IP')
+    global redis_server_ip
     redis_conn = get_redis_connection(host_name = redis_server_ip)
     set_with_expiry(redis_conn,"mqtt_topic_names_read_required", str(True), expiry_time=5)
-    #return jsonify({'status' : "sucess"}), 200
 
 @app.route('/get_heimdall_topic_names', methods=['POST'])
 def get_heimdall_topic_names():
-    load_dotenv()
-    common_secrets, user_secrets= get_vault_secrets(
-        os.getenv('VAULT_ADDR'),os.getenv('VAULT_USER_SECRETS_PATH'),
-        os.getenv('VAULT_USERNAME'),os.getenv('VAULT_PASSWORD')
-    )
-    print("API Called")
-    redis_server_ip = common_secrets.get('REDIS_SERVER_IP')
+    global redis_server_ip
     redis_conn = get_redis_connection(host_name = redis_server_ip)
     value = get_from_cache(redis_conn, "mqtt_topic_names_read_required")
     print(value)
     return jsonify({'Value' : value}), 200
 
+def set_server_details():
+    global redis_server_ip, mysql_ingestor_url, mqtt_etl_handler_queue, etl_handler_url
+
+    load_dotenv()
+    common_secrets, user_secrets= get_vault_secrets(
+        os.getenv('VAULT_ADDR'),os.getenv('VAULT_USER_SECRETS_PATH'),
+        os.getenv('VAULT_USERNAME'),os.getenv('VAULT_PASSWORD')
+    )
+    redis_server_ip = common_secrets.get('REDIS_SERVER_IP')
+    mysql_ingestor_url = user_secrets.get('MYSQL_INGESTOR_URL')
+    mqtt_etl_handler_queue = {
+        'region' : user_secrets.get('MQTT_ETL_HANDLER_QUEUE_REGION'),
+        'url' : user_secrets.get('MQTT_ETL_HANDLER_QUEUE_URL')
+    }
+
+    # DONOT SEND PRODUCTION IP in DATA. Retrieve Production from Environment variable in Lambda
+    if os.getenv('ENVRIONMENT') != "PRODUCTION":
+        etl_handler_url = user_secrets.get('ETL_HANDLER_URL')
+
+    print(f"Set redis ip: {redis_server_ip}, ingestor: {mysql_ingestor_url}, mqtt_etl_handler_queue: {mqtt_etl_handler_queue['url']} , etl_handler_url: {etl_handler_url}")
 
 def main():
-    #TODO Use Dedicated HiveMQ Broker URi
     broker_uri = "broker.hivemq.com"
     broker_port = 1883
 
+    #TODO Use Dedicated HiveMQ Broker URi
     # broker_uri = "221a3edfcfef4303bddeb9408c05a6cd.s1.eu.hivemq.cloud"
     # broker_port = 8883
+    set_server_details()
     refresh_heimdall_topic_names()
     mqtt_client = CHDB_MQTT_SUB(
         broker= broker_uri, port_number=broker_port
-        )
+    )
 
     print("MQTT SUB CLIENT Created")
-    #mqtt_client.connect()
     mqtt_client.connect_mqtt()
     print("MQTT SUB CLIENT Connected")
     if False == mqtt_client.check_mqtt_topic_names():
@@ -200,7 +190,6 @@ def main():
         return 
     mqtt_client.subscribe()
     print("MQTT SUB CLIENT Subscribed")
-    #app.run(host='0.0.0.0', port=3333)
 
 if __name__ == "__main__":
     main()
