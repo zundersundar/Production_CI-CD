@@ -7,7 +7,7 @@ metadata:
     app: mqtt
   annotations:
     vault.hashicorp.com/agent-inject: "true"
-    vault.hashicorp.com/role: "cicd-role" # Replace with your actual Vault role
+    vault.hashicorp.com/role: "cicd-role" 
     vault.hashicorp.com/agent-inject-secret-env: "kv/sundarsecrets"
 spec:
   replicas: 2
@@ -20,8 +20,8 @@ spec:
         app: mqtt 
       annotations:
         vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/role: "cicd-role" # Replace with your actual Vault role
-        vault.hashicorp.com/agent-inject-secret-env: "kv/sundarsecrets" # Replace with your Vault secret path
+        vault.hashicorp.com/role: "cicd-role" 
+        vault.hashicorp.com/agent-inject-secret-env: "towerwatchsecrets/sundarsecrets" 
 
     spec:
       serviceAccountName: vault-auth
