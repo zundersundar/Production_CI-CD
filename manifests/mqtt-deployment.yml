@@ -8,6 +8,7 @@ metadata:
   annotations:
     vault.hashicorp.com/agent-inject: "true"
     vault.hashicorp.com/role: "cicd-role" 
+    vault.hashicorp.com/agent-configmap: "vault-agent-config"
     vault.hashicorp.com/agent-inject-secret-env: "towerwatchsecrets/sundarsecrets" 
 spec:
   replicas: 2
@@ -33,6 +34,33 @@ spec:
         - containerPort: 3333 
       imagePullSecrets:
       - name: ecr-docker-secret
+
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-agent-config
+  namespace: towerwatch
+data:
+  vault-agent-config.hcl: |
+    auto_auth {
+      method "kubernetes" {
+        mount_path = "auth/kubernetes"
+        config = {
+          role = "cicd-role"
+        }
+      }
+    }
+    vault {
+      address = "https://dev.vault.towerwatch.io:8200/:8200"
+    }
+    listener "tcp" {
+      address = "127.0.0.1:8200"
+      tls_disable = 1
+    }
+
 
 
 ---
