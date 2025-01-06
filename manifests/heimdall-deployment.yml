@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: heimdall
-        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-heimdall:heimdall-04fb21b
+        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-heimdall:heimdall-9fa625d
         imagePullPolicy: Always
         ports:
         - containerPort: 7000 
