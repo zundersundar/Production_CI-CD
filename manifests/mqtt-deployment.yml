@@ -28,7 +28,7 @@ spec:
       serviceAccountName: vault
       containers:
       - name: mqtt
-        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-mqtt:mqtt-7fcb8eb
+        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-mqtt:mqtt-dce2971
         imagePullPolicy: Always
         ports:
         - containerPort: 3333 
