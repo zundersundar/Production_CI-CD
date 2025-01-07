@@ -39,7 +39,7 @@ spec:
       volumes:
         - name: vault-secret-volume
           secret:
-            secretName: towerwatch-secrets  
+            secretName: mqtt-secrets  
             
       imagePullSecrets:
       - name: docker-ecr-secret
