@@ -23,3 +23,5 @@ test for vault
 test for vault 2
 
 test for secrets
+
+test for vault 3
