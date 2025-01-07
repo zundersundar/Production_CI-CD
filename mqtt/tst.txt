@@ -21,3 +21,5 @@ test 10 348 flow
 test for vault
 
 test for vault 2
+
+test for secrets
