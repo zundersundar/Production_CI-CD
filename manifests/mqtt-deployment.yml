@@ -25,22 +25,31 @@ spec:
     #    vault.hashicorp.com/agent-inject-secret-env: "towerwatchsecrets/sundarsecrets" 
 
     spec:
-      serviceAccountName: vault
+     # serviceAccountName: vault
       containers:
       - name: mqtt
         image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-mqtt:mqtt-dce2971
         imagePullPolicy: Always
+        volumeMounts:
+            - name: vault-secret-volume
+              mountPath: "/etc/vault-secrets" # Path inside the container
+              readOnly: true
         ports:
         - containerPort: 3333 
+      volumes:
+        - name: vault-secret-volume
+          secret:
+            secretName: towerwatch-secrets  
+            
       imagePullSecrets:
       - name: docker-ecr-secret
-      env:
-        - name: VAULT_ADDR
-          value: "http://vault.towerwatch.svc.cluster.local:8200" 
-        - name: VAULT_USER_SECRETS_PATH
-          value: "secret/towerwatch"
-        - name: VAULT_COMMON_SECRETS_PATH
-          value: "secret/commonsecrets"
+   #   env:
+   #     - name: VAULT_ADDR
+   #       value: "http://vault.towerwatch.svc.cluster.local:8200" 
+   #     - name: VAULT_USER_SECRETS_PATH
+   #       value: "secret/towerwatch"
+   #     - name: VAULT_COMMON_SECRETS_PATH
+   #       value: "secret/commonsecrets"
 
 
 ---
