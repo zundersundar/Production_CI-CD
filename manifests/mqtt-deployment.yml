@@ -36,7 +36,7 @@ spec:
       - name: docker-ecr-secret
       env:
         - name: VAULT_ADDR
-          value: "http://vault.default.svc.cluster.local:8200" 
+          value: "http://vault.towerwatch.svc.cluster.local:8200" 
         - name: VAULT_USER_SECRETS_PATH
           value: "secret/towerwatch"
         - name: VAULT_COMMON_SECRETS_PATH
