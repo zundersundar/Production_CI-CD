@@ -22,7 +22,7 @@ spec:
         ports:
         - containerPort: 6000
       imagePullSecrets:
-      - name: ecr-docker-secret
+      - name: docker-ecr-secret
 
 
 ---
