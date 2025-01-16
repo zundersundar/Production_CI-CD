@@ -2,23 +2,29 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mqtt
-  namespace: towerwatch
+  namespace: towerwatch  
   labels:
     app: mqtt
   annotations:
     vault.hashicorp.com/agent-inject: "true"
-    vault.hashicorp.com/role: "cicd-role"
+    vault.hashicorp.com/role: "cicd-role" 
+    vault.hashicorp.com/agent-configmap: "vault-agent-config"
     vault.hashicorp.com/agent-inject-secret-sundarsecrets: "secret/data/towerwatchsecrets/sundarsecrets"
-    vault.hashicorp.com/agent-inject-secret-commonsecrets: "secret/data/towerwatchsecrets/commonsecrets"
+    vault.hashicorp.com/agent-inject-secret-commonsecrets: "secret/data/towerwatchsecrets/sundarsecrets"
 spec:
   replicas: 2
-  selector:
+  selector:  
     matchLabels:
       app: mqtt
   template:
     metadata:
       labels:
-        app: mqtt
+        app: mqtt 
+    #  annotations:
+    #    vault.hashicorp.com/agent-inject: "true"
+    #    vault.hashicorp.com/role: "cicd-role" 
+    #    vault.hashicorp.com/agent-inject-secret-env: "towerwatchsecrets/sundarsecrets" 
+
     spec:
       serviceAccountName: vault
       containers:
@@ -26,6 +32,90 @@ spec:
         image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-mqtt:mqtt-ff8e05e
         imagePullPolicy: Always
         ports:
-        - containerPort: 3333
+        - containerPort: 3333 
+     #   env:
+     #   - name: VAULT_ADDR
+     #     value: "https://vaulttw.internal.clockhash.com"  # Vault service address
+     #   - name: VAULT_USER_SECRETS_PATH
+     #     value: "secret/data/towerwatchsecret"  # The path to  secrets in Vault
+     #   - name: VAULT_USERNAME
+     #     value: "devuser"  # The username created for userpass auth
+     #   - name: VAULT_PASSWORD
+     #     value: "dev123"
+     #   volumeMounts:
+     #   - name: vault-token
+     #     mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+     #     readOnly: true
+     # volumes:
+     # - name: vault-token
+     #   projected:
+     #     sources:
+     #       - serviceAccountToken:
+     #           path: token 
+      #  volumeMounts:
+      #      - name: vault-secret-volume
+      #        mountPath: "/etc/vault-secrets" 
+      #        readOnly: true
+       # ports:
+       # - containerPort: 3333 
+     # volumes:
+     #   - name: vault-secret-volume
+     #     secret:
+     #       secretName: mqtt-secrets  
+            
       imagePullSecrets:
       - name: docker-ecr-secret
+   #  - name: mqtt-secret
+   #   env:
+   #     - name: VAULT_ADDR
+   #       value: "http://vault.towerwatch.svc.cluster.local:8200" 
+   #     - name: VAULT_USER_SECRETS_PATH
+   #       value: "secret/towerwatch"
+   #     - name: VAULT_COMMON_SECRETS_PATH
+   #       value: "secret/commonsecrets"
+
+
+---
+
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+#  name: vault-agent-config
+#  namespace: towerwatch
+#data:
+#  vault-agent-config.hcl: |
+#    auto_auth {
+#      method "kubernetes" {
+#        mount_path = "auth/kubernetes"
+#        config = {
+#          role = "cicd-role"
+#        }
+#      }
+#    }
+#    vault {
+#      address = "https://dev.vault.towerwatch.io:8200/:8200"
+#    }
+#    listener "tcp" {
+#      address = "127.0.0.1:8200"
+#      tls_disable = 1
+#    }
+
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mqtt  
+  namespace: towerwatch
+  labels:
+    app: mqtt 
+spec:
+  selector:
+    app: mqtt   # Matches the Pod labels
+  ports:
+    - protocol: TCP
+      port: 3333         # The port exposed by the Service
+      targetPort: 3333 # The containerPort in the Pod
+  type: ClusterIP 
