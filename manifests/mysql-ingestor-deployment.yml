@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: mysql-ingestor
-        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-mysql-ingestor:mysql_ingestor-be53ca1
+        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-mysql-ingestor:mysql_ingestor-222d676
         imagePullPolicy: Always
         ports:
         - containerPort: 8000 
