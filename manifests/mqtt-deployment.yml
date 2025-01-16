@@ -33,25 +33,25 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 3333 
-        env:
-        - name: VAULT_ADDR
-          value: "http://vault.towerwatch.svc.cluster.local:8200"  # Vault service address
-        - name: VAULT_USER_SECRETS_PATH
-          value: "secret/data/towerwatchsecret"  # The path to  secrets in Vault
-        - name: VAULT_USERNAME
-          value: "devuser"  # The username created for userpass auth
-        - name: VAULT_PASSWORD
-          value: "dev123"
-        volumeMounts:
-        - name: vault-token
-          mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-          readOnly: true
-      volumes:
-      - name: vault-token
-        projected:
-          sources:
-            - serviceAccountToken:
-                path: token 
+     #   env:
+     #   - name: VAULT_ADDR
+     #     value: "https://vaulttw.internal.clockhash.com"  # Vault service address
+     #   - name: VAULT_USER_SECRETS_PATH
+     #     value: "secret/data/towerwatchsecret"  # The path to  secrets in Vault
+     #   - name: VAULT_USERNAME
+     #     value: "devuser"  # The username created for userpass auth
+     #   - name: VAULT_PASSWORD
+     #     value: "dev123"
+     #   volumeMounts:
+     #   - name: vault-token
+     #     mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+     #     readOnly: true
+     # volumes:
+     # - name: vault-token
+     #   projected:
+     #     sources:
+     #       - serviceAccountToken:
+     #           path: token 
       #  volumeMounts:
       #      - name: vault-secret-volume
       #        mountPath: "/etc/vault-secrets" 
