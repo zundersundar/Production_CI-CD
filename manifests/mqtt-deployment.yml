@@ -5,11 +5,12 @@ metadata:
   namespace: towerwatch  
   labels:
     app: mqtt
- # annotations:
- #   vault.hashicorp.com/agent-inject: "true"
- #   vault.hashicorp.com/role: "cicd-role" 
- #   vault.hashicorp.com/agent-configmap: "vault-agent-config"
- #   vault.hashicorp.com/agent-inject-secret-env: "towerwatchsecrets/sundarsecrets" 
+  annotations:
+    vault.hashicorp.com/agent-inject: "true"
+    vault.hashicorp.com/role: "cicd-role" 
+    vault.hashicorp.com/agent-configmap: "vault-agent-config"
+    vault.hashicorp.com/agent-inject-secret-sundarsecrets: "/towerwatchsecrets/data/sundarsecrets"
+    vault.hashicorp.com/agent-inject-secret-commonsecrets: "/towerwatchsecrets/data/commonsecrets" 
 spec:
   replicas: 2
   selector:  
