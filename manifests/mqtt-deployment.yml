@@ -33,7 +33,9 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 3333 
-      
+      env:
+      - name: VAULT_ADDR
+        value: "https://vaulttw.internal.clockhash.com"
             
       imagePullSecrets:
       - name: docker-ecr-secret
