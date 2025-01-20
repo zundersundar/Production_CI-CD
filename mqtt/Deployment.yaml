@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt
+  namespace: Towerwatch  
+  labels:
+    app: mqtt
+spec:
+  replicas: 2  
+  template:
+    metadata:
+      labels:
+        app: mqtt
+    spec:
+      containers:
+      - name: mqtt
+        image: <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/<REPOSITORY_NAME>:<GITHUB_SHA>
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3333 
+   #     env:
+   #     - name: ENV_VAR_1  
+   #       value: "value1"
+   #     - name: ENV_VAR_2
+   #       value: "value2"

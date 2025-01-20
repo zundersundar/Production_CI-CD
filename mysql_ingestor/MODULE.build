@@ -1,0 +1,7 @@
+module(
+    name = "mysql_ingestor",
+    version = "1.0.0",
+)
+
+# Declare dependencies if needed
+bazel_dep(name = "rules_python", version = "0.22.0")

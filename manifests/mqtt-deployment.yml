@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt
+  namespace: towerwatch  
+  labels:
+    app: mqtt
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mqtt
+  template:
+    metadata:
+      labels:
+        app: mqtt
+    spec:
+      serviceAccountName: vault
+      initContainers:
+      - name: vault-fetcher
+        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-mqtt:mqtt-7cf4831
+        command: ["python", "/app/vault_fetcher.py"]
+        env:
+        - name: VAULT_ADDR
+          value: "https://vaulttw.internal.clockhash.com"
+        - name: VAULT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: vault-userpass-creds
+              key: username
+        - name: VAULT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: vault-userpass-creds
+              key: password
+        - name: VAULT_USER_SECRETS_PATH
+          value: "sundarsecrets"
+        volumeMounts:
+        - name: app-env
+          mountPath: /app/.env
+          subPath: .env
+      containers:
+      - name: mqtt
+        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-mqtt:mqtt-7cf4831
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: app-env-file
+        ports:
+        - containerPort: 3333
+      volumes:
+      - name: app-env
+        emptyDir: {}
+
+            
+      imagePullSecrets:
+      - name: docker-ecr-secret
+   
+
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-agent-config
+  namespace: towerwatch
+data:
+  vault-agent-config.hcl: |
+    auto_auth {
+      method "kubernetes" {
+        mount_path = "auth/kubernetes"
+        config = {
+          role = "cicd-role"
+        }
+      }
+    }
+    vault {
+      address = "https://vaulttw.internal.clockhash.com"
+    }
+    listener "tcp" {
+      address = "127.0.0.1:8200"
+      tls_disable = 1
+    }
+
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mqtt  
+  namespace: towerwatch
+  labels:
+    app: mqtt 
+spec:
+  selector:
+    app: mqtt   # Matches the Pod labels
+  ports:
+    - protocol: TCP
+      port: 3333         # The port exposed by the Service
+      targetPort: 3333 # The containerPort in the Pod
+  type: ClusterIP 

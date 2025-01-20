@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tower-watch-deployment
+  labels:
+    app: tower-watch
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tower-watch
+  template:
+    metadata:
+      labels:
+        app: tower-watch
+    spec:
+      containers:
+        - name: mysql-ingestor
+          image: ghcr.io/zundersundar/mysql_ingestor
+          ports:
+            - containerPort: 8000
+
+
+        - name: heimdall
+          image: ghcr.io/zundersundar/heimdall
+          ports:
+            - containerPort: 7000
+
+        - name: mqtt
+          image: ghcr.io/zundersundar/mqtt
+          ports:
+            - containerPort: 3333
+    
+
+        - name: etl
+          image: ghcr.io/zundersundar/etl
+          ports:
+            - containerPort: 6000
+        
+
+
+        - name: influxdb-ingestor
+          image: ghcr.io/zundersundar/influxdb_ingestor
+          ports:
+            - containerPort: 9000
+          
+
+

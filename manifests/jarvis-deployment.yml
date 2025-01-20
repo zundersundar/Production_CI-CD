@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jarvis
+  namespace: towerwatch
+  labels:
+    app: jarvis
+spec:
+  replicas: 2
+  selector:  
+    matchLabels:
+      app: jarvis
+  template:
+    metadata:
+      labels:
+        app: jarvis  
+    spec:
+      containers:
+      - name: jarvis
+        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-jarvis:jarvis-72e0a27
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6000
+      imagePullSecrets:
+      - name: docker-ecr-secret
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: jarvis  
+  namespace: towerwatch
+  labels:
+    app: jarvis  
+spec:
+  selector:
+    app: jarvis   # Matches the Pod labels
+  ports:
+    - protocol: TCP
+      port: 6000         # The port exposed by the Service
+      targetPort: 6000 # The containerPort in the Pod
+  type: ClusterIP   

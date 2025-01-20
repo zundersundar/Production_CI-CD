@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: heimdall
+  namespace: towerwatch  
+  labels:
+    app: heimdall
+spec:
+  replicas: 2
+  selector:  
+    matchLabels:
+      app: heimdall
+  template:
+    metadata:
+      labels:
+        app: heimdall
+    spec:
+      containers:
+      - name: heimdall
+        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-heimdall:heimdall-f1d6b2f
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 7000 
+      imagePullSecrets:
+      - name: docker-ecr-secret
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: heimdall-service
+  namespace: towerwatch
+  labels:
+    app: heimdall
+spec:
+  selector:
+    app: heimdall # Matches the Pod labels
+  ports:
+    - protocol: TCP
+      port: 7000         # The port exposed by the Service
+      targetPort: 7000 # The containerPort in the Pod
+  type: ClusterIP      

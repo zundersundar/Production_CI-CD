@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-ingestor
+  namespace: towerwatch  
+  labels:
+    app: mysql-ingestor
+spec:
+  replicas: 2
+  selector:  
+    matchLabels:
+      app: mysql-ingestor
+  template:
+    metadata:
+      labels:
+        app: mysql-ingestor 
+    spec:
+      containers:
+      - name: mysql-ingestor
+        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-mysql-ingestor:mysql_ingestor-222d676
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000 
+      imagePullSecrets:
+      - name: docker-ecr-secret
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-ingestor  
+  namespace: towerwatch
+  labels:
+    app: mysql-ingestor 
+spec:
+  selector:
+    app: mysql-ingestor   # Matches the Pod labels
+  ports:
+    - protocol: TCP
+      port: 8000         # The port exposed by the Service
+      targetPort: 8000 # The containerPort in the Pod
+  type: ClusterIP 

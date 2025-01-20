@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-ingestor
+  namespace: Towerwatch  
+  labels:
+    app: mysql-ingestor
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: mysql-ingestor
+    spec:
+      containers:
+      - name: mysql-ingestor
+        image: <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/<REPOSITORY_NAME>:<GITHUB_SHA>
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000 
+   #     env:
+   #     - name: ENV_VAR_1  
+   #       value: "value1"
+   #     - name: ENV_VAR_2
+   #       value: "value2"

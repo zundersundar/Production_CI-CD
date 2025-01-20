@@ -1,0 +1,11 @@
+http_archive(
+    name = "rules_python",
+    urls = ["https://github.com/bazelbuild/rules_python/releases/download/0.20.0/rules_python-0.20.0.tar.gz"],
+    strip_prefix = "rules_python-0.20.0",
+)
+
+load("@rules_python//python:pip.bzl", "pip_install")
+pip_install(
+    name = "pip_deps",
+    requirements = "//:requirements.txt",
+)
