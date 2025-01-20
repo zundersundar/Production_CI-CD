@@ -113,15 +113,10 @@ jobs:
     if: github.event_name == 'workflow_dispatch'  # Only trigger on manual dispatch
 
     steps:
-      - name: Approval Required
-        uses: hmarr/auto-approve-action@v2
-        with:
-          comment: "Manual approval required to proceed with deployment."
-      
       - name: Wait for Manual Approval
         run: |
-          echo "Waiting for manual approval..."
-          while ! [ -f /tmp/approved ]; do sleep 10; done
+         echo "Please confirm deployment to EC2 by re-running the workflow."
+         exit 1  # Force manual intervention by failing the step
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -135,15 +130,23 @@ jobs:
           IMAGE_URI: ${{ secrets.SUNDAR_AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.SUNDAR_AWS_REGION }}.amazonaws.com/${{ secrets.HEIMDALL }}:heimdall-${{ github.sha }}
           ENV_VAR1: ${{ secrets.VAULT_ADDR }}
           ENV_VAR2: ${{ secrets.VAULT_USERNAME }}
-          ENV_VAR3: ${{secrets.VAULT_PASSWORD}}
-          ENV_VAR4: ${{secrets.VAULT_USER_SECRETS_PATH}}
+          ENV_VAR3: ${{ secrets.VAULT_PASSWORD }}
+          ENV_VAR4: ${{ secrets.VAULT_USER_SECRETS_PATH }}
         run: |
           ssh -o "StrictHostKeyChecking=no" -i ${{ secrets.SUNDAR_EC2_SSH_KEY }} ubuntu@${{ secrets.SUNDAR_EC2_PUBLIC_IP }} << 'EOF'
-            docker pull $IMAGE_URI
-            docker run -d --name heimdall-container \
-              -e ENV_VAR1=$VAULT_ADDR \
-              -e ENV_VAR2=$VAULT_USERNAME \
-              -e ENV_VAR3=$VAULT_PASSWORD \
-              -e ENV_VAR4=$VAULT_USER_SECRETS_PATH \
-              $IMAGE_URI
-          EOF
+            set -e  # Exit immediately if a command fails
+
+           echo "Pulling the Docker image..."
+           docker pull $IMAGE_URI
+
+           echo "Stopping any existing container..."
+           docker rm -f heimdall-container || true
+ 
+           echo "Running the new container..."
+           docker run -d --name heimdall-container \
+             -e ENV_VAR1=$ENV_VAR1 \
+             -e ENV_VAR2=$ENV_VAR2 \
+             -e ENV_VAR3=$ENV_VAR3 \
+             -e ENV_VAR4=$ENV_VAR4 \
+             $IMAGE_URI
+         EOF 
