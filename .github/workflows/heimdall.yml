@@ -106,16 +106,44 @@ jobs:
         run: |
           git push origin ${{ github.ref }}
 
-      - name: Update Kubernetes Deployment
-        env:
-          IMAGE_TAG: ${GITHUB_SHA:0:7}
-          IMAGE_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.HEIMDALL }}:heimdall-$IMAGE_TAG
-        run: |
-    
-          sed -i "s|<AWS_ACCOUNT_ID>|${{ secrets.AWS_ACCOUNT_ID }}|g" deployment.yaml
-          sed -i "s|<AWS_REGION>|${{ secrets.AWS_REGION }}|g" deployment.yaml
-          sed -i "s|<REPOSITORY_NAME>|${{ secrets.REPOSITORY_NAME }}|g" deployment.yaml
-          sed -i "s|<GITHUB_SHA>|$IMAGE_TAG|g" deployment.yaml
+  deploy-to-ec2:
+    name: Deploy Docker Image to EC2 (Manual Confirmation Required)
+    runs-on: ubuntu-latest
+    needs: build-push-and-deploy  # Depends on the build-push-and-deploy job
+    if: github.event_name == 'workflow_dispatch'  # Only trigger on manual dispatch
 
-    
-          kubectl apply -f deployment.yaml
+    steps:
+      - name: Approval Required
+        uses: hmarr/auto-approve-action@v2
+        with:
+          comment: "Manual approval required to proceed with deployment."
+      
+      - name: Wait for Manual Approval
+        run: |
+          echo "Waiting for manual approval..."
+          while ! [ -f /tmp/approved ]; do sleep 10; done
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.SUNDAR_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.SUNDAR_SECRET_KEY }}
+          aws-region: ${{ secrets.SUNDAR_AWS_REGION }}
+
+      - name: SSH into EC2 Instance and Deploy
+        env:
+          IMAGE_URI: ${{ secrets.SUNDAR_AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.SUNDAR_AWS_REGION }}.amazonaws.com/${{ secrets.HEIMDALL }}:heimdall-${{ github.sha }}
+          ENV_VAR1: ${{ secrets.VAULT_ADDR }}
+          ENV_VAR2: ${{ secrets.VAULT_USERNAME }}
+          ENV_VAR3: ${{secrets.VAULT_PASSWORD}}
+          ENV_VAR4: ${{secrets.VAULT_USER_SECRETS_PATH}}
+        run: |
+          ssh -o "StrictHostKeyChecking=no" -i ${{ secrets.SUNDAR_EC2_SSH_KEY }} ubuntu@${{ secrets.SUNDAR_EC2_PUBLIC_IP }} << 'EOF'
+            docker pull $IMAGE_URI
+            docker run -d --name heimdall-container \
+              -e ENV_VAR1=$VAULT_ADDR \
+              -e ENV_VAR2=$VAULT_USERNAME \
+              -e ENV_VAR3=$VAULT_PASSWORD \
+              -e ENV_VAR4=$VAULT_USER_SECRETS_PATH \
+              $IMAGE_URI
+          EOF
