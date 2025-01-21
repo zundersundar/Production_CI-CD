@@ -19,6 +19,22 @@ spec:
       - name: mysql-ingestor
         image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-mysql-ingestor:mysql_ingestor-222d676
         imagePullPolicy: Always
+        env:
+        - name: VAULT_ADDR
+          valueFrom:
+            secretKeyRef:
+              name: vault-config
+              key: VAULT_ADDR
+        - name: VAULT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: vault-config
+              key: VAULT_USERNAME
+        - name: VAULT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: vault-config
+              key: VAULT_PASSWORD
         ports:
         - containerPort: 8000 
       imagePullSecrets:

@@ -21,6 +21,22 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 7000 
+        env:
+        - name: VAULT_ADDR
+          valueFrom:
+            secretKeyRef:
+              name: vault-config
+              key: VAULT_ADDR
+        - name: VAULT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: vault-config
+              key: VAULT_USERNAME
+        - name: VAULT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: vault-config
+              key: VAULT_PASSWORD
       imagePullSecrets:
       - name: docker-ecr-secret
 
