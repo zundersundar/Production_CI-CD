@@ -16,41 +16,37 @@ spec:
         app: mqtt
     spec:
       serviceAccountName: vault
-      initContainers:
-      - name: vault-fetcher
-        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-mqtt:mqtt-7cf4831
-        command: ["python", "/app/vault_fetcher.py"]
-        env:
-        - name: VAULT_ADDR
-          value: "https://vaulttw.internal.clockhash.com"
-        - name: VAULT_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: vault-userpass-creds
-              key: username
-        - name: VAULT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: vault-userpass-creds
-              key: password
-        - name: VAULT_USER_SECRETS_PATH
-          value: "sundarsecrets"
-        volumeMounts:
-        - name: app-env
-          mountPath: /app/.env
-          subPath: .env
+
       containers:
       - name: mqtt
         image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-mqtt:mqtt-7cf4831
         imagePullPolicy: Always
-        envFrom:
-        - configMapRef:
-            name: app-env-file
+        env:
+        - name: VAULT_ADDR
+          valueFrom:
+            secretKeyRef:
+              name: vault-config
+              key: VAULT_ADDR
+        - name: VAULT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: vault-config
+              key: VAULT_USERNAME
+        - name: VAULT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: vault-config
+              key: VAULT_PASSWORD
+
+ 
+ #       envFrom:
+ #       - configMapRef:
+ #           name: app-env-file
         ports:
         - containerPort: 3333
-      volumes:
-      - name: app-env
-        emptyDir: {}
+ #     volumes:
+ #     - name: app-env
+ #       emptyDir: {}
 
             
       imagePullSecrets:
