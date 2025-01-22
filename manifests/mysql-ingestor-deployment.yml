@@ -35,6 +35,11 @@ spec:
             secretKeyRef:
               name: vault-config
               key: VAULT_PASSWORD
+        - name: VAULT_USER_SECRETS_PATH
+          valueFrom:
+            secretKeyRef:
+              name: vault-config
+              key: VAULT_USER_SECRETS_PATH
         ports:
         - containerPort: 8000 
       imagePullSecrets:
