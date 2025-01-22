@@ -38,10 +38,11 @@ def set_server_details():
     if os.getenv('ENVIRONMENT') != "PRODUCTION":
         heimdall_handler_url = user_secrets.get('HEIMDALL_HANDLER_URL')
     
-    print(f"Set queue url: {etl_heimdall_handler_queue['url']}, heimdall_handler_url: {heimdall_handler_url}")
+    print(f"Set redis server: {redis_server_ip}, mysql_ingestor_url: {mysql_ingestor_url}, queue url: {etl_heimdall_handler_queue['url']}, heimdall_handler_url: {heimdall_handler_url}")
 
 
 def read_sensor_id_and_value(sensor_data):
+    global mysql_ingestor_url
     read_sensor_id_value_endpoint = (
         f"{mysql_ingestor_url}/sensor_id_and_value/"
         f"{sensor_data['customer_name']}/"
@@ -52,7 +53,8 @@ def read_sensor_id_and_value(sensor_data):
         f"{sensor_data['sensor_type']}"
     )
     
-    print(f"TW_DBG, Reading Sensor ID and Value from memory, 'customer_name' : {sensor_data['customer_name']}, "
+    print(f"TW_DBG, Reading Sensor ID and Value from memory, endpoint: {read_sensor_id_value_endpoint}, "
+          f" 'customer_name' : {sensor_data['customer_name']}, "
           f"'site_name' : {sensor_data['site_name']}, "
           f"'building_name' : {sensor_data['building_name']}, "
           f"'floor_position' : {sensor_data['floor_position']}, "
@@ -67,10 +69,8 @@ def read_sensor_id_and_value(sensor_data):
             return response_data
         elif response.status_code == 404:
             print("Sensor Not Found")
-            return None
         else:
             print(f"TW_ERR: Unexpected error code {response.status_code}")
-            return {'status': 'error', 'status_code': response.status_code}
 
     except Exception as e:
         print(f"{str(e)} : Error occured in read_sensor_id_and_value Endpoint. Please Debug. Cannot Go Further")
@@ -141,14 +141,13 @@ def etl_thread(sensor_data):
     # 1. Do sensor value validation. there will be an expected value range
     # 2. Validate unit of value
     # 3. Add ML data scaling if required
-    print("Writing data to ETL HEIMDALL Queue")
     if heimdall_handler_url is not None:
         sensor_data['heimdall_handler_url'] = heimdall_handler_url
+    print(f"TW_DBG, Sensor Data: {sensor_data}")
     result = write_to_sqs_queue (
         region = etl_heimdall_handler_queue['region'],
         queue_url = etl_heimdall_handler_queue['url'],
         message_body = sensor_data
-        #message_body = json.dumps(sensor_data)
     )
 
 

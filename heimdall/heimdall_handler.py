@@ -141,11 +141,10 @@ def heimdall_thread(sensor_data):
 #This API will be called from HTTP Endpoint hook subscribed to SNS topic
 @app.route('/initiate_heimdall_handler', methods=['POST'])
 def heimdall_handler():
-    print("Heimdall Process CALLED")
 
     data = request.json
     heimdall_thread(sensor_data = data)
-    print("Waiting for task to return")
+    print("TW_DBG, Waiting for task to return")
     return 'API call submitted', 200
 
 def set_server_details():
@@ -169,10 +168,10 @@ def set_server_details():
     #if os.getenv('ENVIRONMENT') != "PRODUCTION":
     #    heimdall_handler_url = user_secrets.get('HEIMDALL_HANDLER_URL')
 
-    print(f"Set queue url: {heimdall_patrol_handler_queue['url']}")
+    print(f"TW_DBG, Set mysql_ingestor_url: {mysql_ingestor_url}, influx_ingestor_url: {influx_ingestor_url}, queue url: {heimdall_patrol_handler_queue['url']}")
 
 def main():
-    print("Heimdall Handler App Started")
+    print("TW_DBG, Heimdall Handler App Started")
     set_server_details()
     app.run(host='0.0.0.0', port=7000)
 
