@@ -41,42 +41,22 @@ class CHDB_MQTT_SUB:
         self.client = None
         self.mqtt_broker = broker
         self.port_number = port_number
-        self.subscribed = False  # Mark the client as disconnected
-       
-    def subscribe_to_topics(self):
-        self.subscribed = True  # Mark the client as disconnected
-        if False == self.check_mqtt_topic_names():
-            print("Something Gone Wrong. Please Debug")
-            return 
-        self.subscribe()
-        print("MQTT SUB CLIENT Subscribed")
-
-    def on_connect(self, client, userdata, flags, rc):
-        if rc == 0:
-            print("Connected to MQTT Broker!")
-        else:
-            print("Failed to connect, return code %d\n", rc)
         
-    def on_disconnect(self, client, userdata,rc):
-        print(f"Disconnected with result code {rc}")
-        self.subscribed = False  # Mark the client as disconnected
-        self.client.loop_stop()
-        self.client.disconnect()
-
     def connect_mqtt(self):
+        def on_connect(client, userdata, flags, rc):
+            if rc == 0:
+                print("Connected to MQTT Broker!")
+            else:
+                print("Failed to connect, return code %d\n", rc)
+        def on_log(client, userdata, level, buf):
+            print("log: ",buf)
+
         self.client_id = f'subscribe-{random.randint(0, 100)}'
         self.client = mqtt.Client(self.client_id)
-        self.client.on_connect = self.on_connect
-        self.client.on_disconnect = self.on_disconnect
-        self.client.on_log = self.on_log
-        while True:
-            if self.subscribed == False:  # Mark the client as disconnected
-                print("Connecting and Subscribing to topics")
-                self.client.connect(self.mqtt_broker, self.port_number)
-                self.subscribe_to_topics()
-                self.client.loop_forever()
-            time.sleep(10)
-            print("************************* Still in loop *********************")
+        self.client.on_connect = on_connect
+        self.client.on_log = on_log
+        self.client.connect(self.mqtt_broker, self.port_number)
+
 
     def on_log(client, userdata, level, buf):
         print("log: ",buf)
@@ -124,8 +104,7 @@ class CHDB_MQTT_SUB:
         def mqtt_read_topics(client, userdata, message) -> None:
             def send_to_mqtt_listener(value):
                 global mqtt_etl_handler_queue, etl_handler_url
-                if etl_handler_url is not None:
-                    value['etl_handler_url'] = etl_handler_url
+                value['etl_handler_url'] = etl_handler_url
                 print(f'Value:{value}')
                 try:
                     response = write_to_sqs_queue(
@@ -152,6 +131,7 @@ class CHDB_MQTT_SUB:
         
         #time.sleep(5)
         print("Client Subscribed to topics")
+        self.client.loop_forever()
  
 #This api shall be called in case a new topic is added to DB. For eg: a new customer site is added in the system
 #@app.route('/refresh_heimdall_topic_names', methods=['POST'])
@@ -176,8 +156,6 @@ def set_server_details():
         os.getenv('VAULT_ADDR'),os.getenv('VAULT_USER_SECRETS_PATH'),
         os.getenv('VAULT_USERNAME'),os.getenv('VAULT_PASSWORD')
     )
-    print("common_secrets: ", common_secrets)
-    print("user_secrets: ", user_secrets)
     redis_server_ip = common_secrets.get('REDIS_SERVER_IP')
     mysql_ingestor_url = user_secrets.get('MYSQL_INGESTOR_URL')
     mqtt_etl_handler_queue = {
@@ -199,14 +177,19 @@ def main():
     # broker_uri = "221a3edfcfef4303bddeb9408c05a6cd.s1.eu.hivemq.cloud"
     # broker_port = 8883
     set_server_details()
-     refresh_heimdall_topic_names()
-     mqtt_client = CHDB_MQTT_SUB(
-         broker= broker_uri, port_number=broker_port
-     )
+    refresh_heimdall_topic_names()
+    mqtt_client = CHDB_MQTT_SUB(
+        broker= broker_uri, port_number=broker_port
+    )
 
     print("MQTT SUB CLIENT Created")
     mqtt_client.connect_mqtt()
     print("MQTT SUB CLIENT Connected")
+    if False == mqtt_client.check_mqtt_topic_names():
+        print("Something Gone Wrong. Please Debug")
+        return 
+    mqtt_client.subscribe()
+    print("MQTT SUB CLIENT Subscribed")
 
 if __name__ == "__main__":
     main()
