@@ -176,6 +176,8 @@ def set_server_details():
         os.getenv('VAULT_ADDR'),os.getenv('VAULT_USER_SECRETS_PATH'),
         os.getenv('VAULT_USERNAME'),os.getenv('VAULT_PASSWORD')
     )
+    print("common_secrets: ", common_secrets)
+    print("user_secrets: ", user_secrets)
     redis_server_ip = common_secrets.get('REDIS_SERVER_IP')
     mysql_ingestor_url = user_secrets.get('MYSQL_INGESTOR_URL')
     mqtt_etl_handler_queue = {
@@ -197,10 +199,10 @@ def main():
     # broker_uri = "221a3edfcfef4303bddeb9408c05a6cd.s1.eu.hivemq.cloud"
     # broker_port = 8883
     set_server_details()
-    refresh_heimdall_topic_names()
-    mqtt_client = CHDB_MQTT_SUB(
-        broker= broker_uri, port_number=broker_port
-    )
+    # refresh_heimdall_topic_names()
+    # mqtt_client = CHDB_MQTT_SUB(
+    #     broker= broker_uri, port_number=broker_port
+    # )
 
     print("MQTT SUB CLIENT Created")
     mqtt_client.connect_mqtt()
