@@ -42,6 +42,22 @@ spec:
             secretKeyRef:
               name: vault-config
               key: VAULT_USER_SECRETS_PATH
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: vault-config
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_REGION
+          valueFrom:
+            secretKeyRef:
+              name: vault-config
+              key: AWS_REGION
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: vault-config
+              key: AWS_SECRET_ACCESS_KEY
+
       imagePullSecrets:
       - name: docker-ecr-secret
 
