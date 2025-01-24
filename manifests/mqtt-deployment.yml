@@ -19,7 +19,7 @@ spec:
 
       containers:
       - name: mqtt
-        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-mqtt:mqtt-c2da994
+        image: 009925156537.dkr.ecr.eu-west-1.amazonaws.com/towerwatch-mqtt:mqtt-8b82103
         imagePullPolicy: Always
         env:
         - name: VAULT_ADDR
