@@ -6,7 +6,7 @@ services:
 
     build: ./mysql_ingestor/
 
-    image: ingestor:latest
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${HEIMDALL}:mysql-ingestor-${IMAGE_TAG}
     container_name: mysql_ingestor
     ports: 
       - "8000:8000"
@@ -18,7 +18,7 @@ services:
 
     build: ./influxdb_ingestor
 
-    image: influx:latest
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${HEIMDALL}:influxdb-ingestor-${IMAGE_TAG}
     container_name: influx_container
     ports:
       - "9000:9000"
@@ -28,7 +28,7 @@ services:
   mqtt:
   
     build: ./mqtt/
-    image: mqtt:latest
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${HEIMDALL}:mqtt-${IMAGE_TAG}
     #entrypoint: ["/bin/sh", "-c", "sleep 600" ]
     container_name: mqtt
     ports:
@@ -39,7 +39,7 @@ services:
 
   etl:
     build: ./jarvis/
-    image: etl:latest
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${HEIMDALL}:etl-${IMAGE_TAG}
     container_name: etl
     ports:
       - "6000:6000"
@@ -49,7 +49,7 @@ services:
   heimdall:
      
     build: ./heimdall
-    image: heimdall:latest
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${HEIMDALL}:heimdall-${IMAGE_TAG}
     container_name: heimdall
     ports:
       - "7000:7000"
@@ -67,4 +67,5 @@ services:
 
 networks:
   tower:
+  name: backend_tower
     driver: bridge
