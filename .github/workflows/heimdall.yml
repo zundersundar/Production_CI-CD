@@ -89,6 +89,10 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           HEIMDALL: ${{ secrets.HEIMDALL }}
         run: |
+
+          SHORT_SHA=$(echo $IMAGE_TAG | cut -c1-7)
+
+
           echo "$SSH_PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
 
@@ -99,10 +103,10 @@ jobs:
 
 
             echo "Pulling latest Docker image..."
-            docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$HEIMDALL:heimdall-$IMAGE_TAG
+            docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$HEIMDALL:heimdall-$SHORT_SHA
             
             echo "Updating docker-compose file..."
-            sed -i "s|image:.*|image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$HEIMDALL:heimdall-$IMAGE_TAG|g" docker-compose.yml
+            sed -i "s|image:.*|image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$HEIMDALL:heimdall-$SHORT_SHA|g" docker-compose.yml
 
             echo "Restarting services..."
             docker-compose down
