@@ -108,6 +108,7 @@ jobs:
         if: contains(steps.changed-modules.outputs.modules, 'heimdall')
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.TOKEN }}
           script: |
             const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
             await github.rest.actions.createWorkflowDispatch({
