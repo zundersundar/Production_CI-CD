@@ -104,7 +104,7 @@ jobs:
 
             echo "Pulling latest Docker image..."
             docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$HEIMDALL:heimdall-$SHORT_SHA
-            docker run heimdall-$SHORT_SHA
+            docker run $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$HEIMDALL:heimdall-$SHORT_SHA
             EOF
           #  echo "Updating docker-compose file..."
           #  sed -i "s|image:.*|image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$HEIMDALL:heimdall-$SHORT_SHA|g" docker-compose.yml
