@@ -81,7 +81,7 @@ jobs:
 
       - name: Deploy to EC2
         env:
-          EC2_USER: ubuntu  # Change to the correct user if different
+          EC2_USER: angel  # Change to the correct user if different
           EC2_HOST: ${{ secrets.EC2_HOST }}
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
           IMAGE_TAG: ${{ github.sha }}
